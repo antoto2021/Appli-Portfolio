@@ -1,1 +1,637 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Green Codex : Encyclopédie & Collection</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.plot.ly/plotly-2.27.0.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700;900&display=swap" rel="stylesheet">
+    
+    <style>
+        body { font-family: 'Roboto', sans-serif; background-color: #F0FDF4; }
+        
+        /* Utils */
+        .chart-container { position: relative; width: 100%; height: 350px; margin: 0 auto; }
+        .hidden { display: none !important; }
+        .fade-in { animation: fadeIn 0.4s ease-in-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
+        /* Flowchart */
+        .flow-box { position: relative; transition: all 0.3s; }
+        .flow-arrow::after { content: '▼'; position: absolute; bottom: -25px; left: 50%; transform: translateX(-50%); color: #059669; font-size: 1.2rem; }
+        @media (min-width: 768px) {
+            .flow-arrow-md::after { content: '▶'; top: 50%; right: -25px; bottom: auto; left: auto; transform: translateY(-50%); }
+        }
+
+        /* Interactive Cards */
+        .card-interactive { cursor: pointer; transition: all 0.3s ease; }
+        .card-interactive:hover { transform: translateY(-5px); box-shadow: 0 10px 20px rgba(0,0,0,0.1); }
+        
+        /* Inputs for Collection */
+        .input-field {
+            width: 100%; padding: 12px; border-radius: 0.75rem; border: 1px solid #e2e8f0;
+            background: #fff; outline: none; transition: border-color 0.2s;
+        }
+        .input-field:focus { border-color: #10b981; ring: 2px solid #10b981; }
+
+        /* Section Titles Standardization */
+        .section-title {
+            font-size: 1.875rem; /* text-3xl */
+            line-height: 2.25rem;
+            font-weight: 700; /* font-bold */
+            color: #064E3B; /* text-emerald-900 */
+            margin-bottom: 1rem;
+        }
+    </style>
+</head>
+<body class="text-slate-800 pb-20">
+
+    <!-- HEADER -->
+    <header class="bg-gradient-to-r from-emerald-900 to-emerald-700 text-white p-6 shadow-lg sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto flex justify-between items-center">
+            <div onclick="showView('home')" class="cursor-pointer">
+                <h1 class="text-2xl md:text-3xl font-black tracking-tight">GREEN <span class="text-emerald-300">CODEX</span></h1>
+                <p class="text-xs md:text-sm text-emerald-200">Encyclopédie & Portfolio</p>
+            </div>
+            <button id="navBackBtn" onclick="showView('home')" class="hidden bg-white/20 hover:bg-white/30 text-white px-4 py-2 rounded-lg text-sm font-bold transition backdrop-blur-sm">
+                ← Retour Menu
+            </button>
+        </div>
+    </header>
+
+    <main class="max-w-7xl mx-auto p-4 md:p-8 space-y-16">
+
+        <!-- ==================== VIEW: HOME ==================== -->
+        <div id="view-home" class="fade-in space-y-16">
+            
+            <!-- 1. INTRO -->
+            <section class="bg-white rounded-2xl shadow-md p-8 border-l-8 border-emerald-600">
+                <h2 class="section-title">1. L'Odyssée de la Plante</h2>
+                <p class="text-lg leading-relaxed text-slate-600">
+                    L'histoire du Cannabis est une symbiose millénaire entre l'homme et la nature. 
+                    D'un côté, la <strong>Weed</strong> (Fleur), cultivée et sélectionnée depuis l'Antiquité pour s'adapter aux climats des montagnes de l'Hindu Kush jusqu'aux jungles tropicales.
+                    De l'autre, le <strong>Hash</strong> (Résine), l'art ancestral de séparer mécaniquement les trichomes pour concentrer l'essence même de la plante.
+                    <br><br>
+                    Aujourd'hui, ces traditions rencontrent la science moderne pour créer un spectre infini de saveurs et d'effets. Cette application est votre guide et votre carnet de bord.
+                </p>
+            </section>
+
+            <!-- 2. MY COLLECTION (NEW) -->
+            <section id="my-collection-preview" class="bg-slate-900 rounded-2xl p-8 text-white relative overflow-hidden shadow-xl">
+                <div class="absolute top-0 right-0 w-64 h-64 bg-emerald-500 rounded-full blur-[80px] opacity-20 pointer-events-none"></div>
+                
+                <div class="relative z-10">
+                    <div class="flex justify-between items-end mb-6">
+                        <div>
+                            <h2 class="text-3xl font-bold text-white mb-2">2. Ma Collection</h2>
+                            <p class="text-slate-400">Votre carnet de dégustation personnel.</p>
+                        </div>
+                        <button onclick="showView('collection')" class="bg-emerald-500 hover:bg-emerald-400 text-white px-6 py-3 rounded-xl font-bold transition shadow-lg flex items-center gap-2">
+                            <span>📂</span> Ouvrir mon Portfolio
+                        </button>
+                    </div>
+
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                        <div class="bg-slate-800 p-4 rounded-xl border border-slate-700">
+                            <span class="text-slate-400 text-xs uppercase font-bold">Total Entrées</span>
+                            <div class="text-3xl font-black text-white" id="stats-total">0</div>
+                        </div>
+                        <div class="bg-slate-800 p-4 rounded-xl border border-slate-700">
+                            <span class="text-slate-400 text-xs uppercase font-bold">Weeds 🥦</span>
+                            <div class="text-3xl font-black text-emerald-400" id="stats-weed">0</div>
+                        </div>
+                        <div class="bg-slate-800 p-4 rounded-xl border border-slate-700">
+                            <span class="text-slate-400 text-xs uppercase font-bold">Hashs 🍫</span>
+                            <div class="text-3xl font-black text-amber-500" id="stats-hash">0</div>
+                        </div>
+                        <div class="bg-slate-800 p-4 rounded-xl border border-slate-700">
+                            <span class="text-slate-400 text-xs uppercase font-bold">Valeur Est.</span>
+                            <div class="text-3xl font-black text-purple-400" id="stats-value">0€</div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 3. FAMILLES -->
+            <section>
+                <div class="mb-8 border-b border-slate-200 pb-4">
+                    <h2 class="section-title">3. Les Familles Fondamentales</h2>
+                    <p class="text-slate-600">Explorez les standards de l'industrie.</p>
+                </div>
+
+                <!-- Hash -->
+                <h3 class="text-xl font-bold text-slate-700 mb-4 flex items-center">🧪 Le Monde des Concentrés (Hash)</h3>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+                    <div onclick="showDetail('hash_dry')" class="bg-white p-6 rounded-xl shadow-md border-t-4 border-amber-500 card-interactive group">
+                        <div class="flex justify-between"> <div class="text-4xl mb-4">🏜️</div> <span class="text-xs font-bold text-amber-600 bg-amber-50 px-2 py-1 rounded h-fit">TRADITION</span> </div>
+                        <h3 class="text-xl font-bold text-slate-800 group-hover:text-amber-600">Dry Sift & Classique</h3>
+                    </div>
+                    <div onclick="showDetail('hash_water')" class="bg-white p-6 rounded-xl shadow-md border-t-4 border-blue-500 card-interactive group">
+                        <div class="flex justify-between"> <div class="text-4xl mb-4">❄️</div> <span class="text-xs font-bold text-blue-600 bg-blue-50 px-2 py-1 rounded h-fit">PURETÉ</span> </div>
+                        <h3 class="text-xl font-bold text-slate-800 group-hover:text-blue-600">Ice-O-Lator & Frozen</h3>
+                    </div>
+                    <div onclick="showDetail('hash_rosin')" class="bg-white p-6 rounded-xl shadow-md border-t-4 border-purple-500 card-interactive group">
+                        <div class="flex justify-between"> <div class="text-4xl mb-4">🔥</div> <span class="text-xs font-bold text-purple-600 bg-purple-50 px-2 py-1 rounded h-fit">MODERNE</span> </div>
+                        <h3 class="text-xl font-bold text-slate-800 group-hover:text-purple-600">Rosin (Solventless)</h3>
+                    </div>
+                </div>
+
+                <!-- Weed -->
+                <h3 class="text-xl font-bold text-slate-700 mb-4 flex items-center">🌱 Le Monde de la Fleur (Weed)</h3>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div onclick="showDetail('weed_indica')" class="bg-white p-6 rounded-xl shadow-md border-t-4 border-indigo-500 card-interactive group">
+                        <div class="flex justify-between"> <div class="text-4xl mb-4">🏔️</div> <span class="text-xs font-bold text-indigo-600 bg-indigo-50 px-2 py-1 rounded h-fit">RELAX</span> </div>
+                        <h3 class="text-xl font-bold text-slate-800 group-hover:text-indigo-600">Indica & Kush</h3>
+                    </div>
+                    <div onclick="showDetail('weed_sativa')" class="bg-white p-6 rounded-xl shadow-md border-t-4 border-yellow-500 card-interactive group">
+                        <div class="flex justify-between"> <div class="text-4xl mb-4">☀️</div> <span class="text-xs font-bold text-yellow-600 bg-yellow-50 px-2 py-1 rounded h-fit">ÉNERGIE</span> </div>
+                        <h3 class="text-xl font-bold text-slate-800 group-hover:text-yellow-600">Sativa & Haze</h3>
+                    </div>
+                    <div onclick="showDetail('weed_exotic')" class="bg-white p-6 rounded-xl shadow-md border-t-4 border-pink-500 card-interactive group">
+                        <div class="flex justify-between"> <div class="text-4xl mb-4">🧬</div> <span class="text-xs font-bold text-pink-600 bg-pink-50 px-2 py-1 rounded h-fit">HYBRIDE</span> </div>
+                        <h3 class="text-xl font-bold text-slate-800 group-hover:text-pink-600">Exotics & Cali</h3>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 4. POTENCY -->
+            <section class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                <div class="lg:col-span-2 bg-white p-6 rounded-xl shadow-lg">
+                    <h2 class="section-title">4. Échelle de Puissance (THC)</h2>
+                    <div class="chart-container">
+                        <canvas id="potencyChart"></canvas>
+                    </div>
+                </div>
+                <div class="lg:col-span-1 bg-emerald-50 border-l-4 border-emerald-500 p-6 rounded-r-xl">
+                    <h4 class="font-bold text-emerald-900 text-lg mb-2">Le Saviez-vous ?</h4>
+                    <p class="text-sm text-emerald-800">
+                        La puissance ne fait pas tout. L'effet ressenti dépend de l'<strong>Effet d'Entourage</strong> : la synergie entre les cannabinoïdes (THC, CBD) et les terpènes. C'est pourquoi une fleur à 20% peut parfois sembler plus "complète" qu'un distillat à 90%.
+                    </p>
+                </div>
+            </section>
+
+            <!-- 5. COMPARATOR -->
+            <section class="bg-white p-8 rounded-2xl shadow-xl border border-slate-100">
+                <h2 class="section-title">5. Comparateur de Profils</h2>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                    <div class="space-y-6 flex flex-col justify-center bg-slate-50 p-6 rounded-xl">
+                        <div>
+                            <label class="block text-sm font-bold text-slate-700 mb-2">Produit A (Bleu)</label>
+                            <select id="selectA" class="w-full p-3 rounded border border-slate-300 bg-white outline-none" onchange="updateComparator()"></select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-bold text-slate-700 mb-2">Produit B (Rose)</label>
+                            <select id="selectB" class="w-full p-3 rounded border border-slate-300 bg-white outline-none" onchange="updateComparator()"></select>
+                        </div>
+                    </div>
+                    <div class="md:col-span-2">
+                        <div class="chart-container">
+                            <canvas id="comparatorRadar"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 6. MATRIX -->
+            <section class="bg-white p-6 rounded-xl shadow-md">
+                <h2 class="section-title">6. Matrice : Texture vs Pureté</h2>
+                <p class="text-slate-600 mb-4">Positionnement des produits de la fleur brute aux extraits les plus raffinés.</p>
+                <div id="globalMatrixPlot" class="w-full h-[700px]"></div>
+            </section>
+
+            <!-- 7. LEXICON -->
+            <section class="bg-slate-900 text-slate-300 p-8 rounded-xl">
+                <h2 class="section-title !text-white">7. Petit Lexique du Connaisseur</h2>
+                <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6 text-sm">
+                    <div><strong class="block text-emerald-400">Trichomes</strong>Ce sont de minuscules glandes résineuses, souvent en forme de champignons microscopiques, qui 
+                    recouvrent les fleurs et les feuilles de la plante. C'est à l'intérieur de ces glandes que sont fabriqués et stockés la majorité des cannabinoïdes (THC, CBD) 
+                    et des huiles essentielles (terpènes).</div>
+                    <div><strong class="block text-emerald-400">Terpènes</strong>Il s'agit des composés organiques aromatiques responsables de l'odeur et du goût de la plante 
+                    (notes citronnées, terreuses, florales, etc.). Au-delà de l'arôme, ils interagissent avec les cannabinoïdes pour moduler les effets ressentis par l'utilisateur, 
+                    un phénomène appelé l'effet d'entourage.</div>
+                    <div><strong class="block text-emerald-400">Full Melt</strong>Ce terme désigne une qualité exceptionnelle de haschisch ou de résine qui fond intégralement sous 
+                    l'effet de la chaleur, sans laisser de résidu solide ou de contaminants. C'est un indicateur de très haute pureté, signifiant que le produit est composé presque 
+                    exclusivement de têtes de trichomes intactes.</div>
+                    <div><strong class="block text-emerald-400">Fresh Frozen</strong>C'est une technique où la plante est congelée immédiatement après la récolte, sans passer par 
+                    l'étape traditionnelle de séchage. Cela permet de préserver les terpènes les plus volatils et l'arôme "vivant" de la plante fraîche, généralement pour produire 
+                    des extractions de type "Live Rosin" ou "Live Resin".</div>
+                    <div><strong class="block text-emerald-400">Curing</strong>C'est l'étape d'affinage qui suit le séchage, consistant à stocker les fleurs dans des contenants 
+                    hermétiques avec une humidité contrôlée pendant plusieurs semaines. Ce processus permet de dégrader la chlorophylle, d'éliminer l'âpreté de la fumée et de 
+                    révéler la pleine complexité des saveurs.</div>
+                    <div><strong class="block text-emerald-400">Solventless</strong>Ce mot qualifie les méthodes d'extraction qui n'utilisent aucun solvant chimique 
+                    (comme le butane, le propane ou le CO2). L'extraction se fait uniquement via des procédés mécaniques, l'eau, la chaleur ou la pression (ex : Rosin, Ice-O-Lator), 
+                    garantissant un produit final très naturel.</div>
+                    <div><strong class="block text-emerald-400">Phénotype</strong>C'est l'expression physique unique d'une génétique donnée (taille, couleur, odeur) sur 
+                    un plant spécifique. Même si des graines proviennent des mêmes parents, chaque graine peut donner un "phéno" différent ; les cultivateurs sélectionnent 
+                    souvent le meilleur (le "keeper") pour le cloner.</div>
+                    <div><strong class="block text-emerald-400">Terroir</strong>Emprunté au vocabulaire du vin, ce concept désigne l'influence de l'environnement naturel 
+                    (sol, climat, ensoleillement, vent) sur la culture en extérieur. Le terroir donne une identité unique à la plante, influençant subtilement son profil 
+                    de cannabinoïdes et de saveurs selon l'endroit où elle a poussé.</div>
+                </div>
+            </section>
+        </div>
+
+
+        <!-- ==================== VIEW: DETAIL (ENCYCLOPEDIA) ==================== -->
+        <div id="view-detail" class="hidden fade-in space-y-8 pb-12">
+            <!-- Header Dynamique -->
+            <div id="detail-header" class="bg-white p-8 rounded-2xl shadow-lg border-t-8">
+                <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6">
+                    <div>
+                        <span id="detail-badge" class="px-3 py-1 rounded-full text-sm font-bold uppercase tracking-wider mb-2 inline-block">Badge</span>
+                        <h2 id="detail-title" class="text-4xl md:text-5xl font-black text-slate-800">Title</h2>
+                    </div>
+                    <div class="text-5xl opacity-20 mt-4 md:mt-0" id="detail-icon">icon</div>
+                </div>
+                <p id="detail-desc" class="text-lg text-slate-600 leading-relaxed border-l-4 border-slate-200 pl-4">Desc</p>
+            </div>
+            <!-- Process -->
+            <section class="bg-slate-800 text-white p-8 rounded-2xl shadow-xl">
+                <h3 class="text-2xl font-bold mb-6">Processus / Caractéristiques</h3>
+                <div id="detail-flow" class="grid grid-cols-1 md:grid-cols-4 gap-4 text-center"></div>
+            </section>
+            <!-- Charts -->
+            <section class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                <div class="bg-white p-6 rounded-xl shadow-md">
+                    <h3 class="font-bold text-slate-800 mb-2">Profil Arômes & Effets</h3>
+                    <div class="chart-container"><canvas id="detailRadarChart"></canvas></div>
+                </div>
+                <div class="bg-white p-6 rounded-xl shadow-md">
+                    <h3 class="font-bold text-slate-800 mb-2">Métriques</h3>
+                    <div class="chart-container"><canvas id="detailBarChart"></canvas></div>
+                </div>
+            </section>
+        </div>
+
+
+        <!-- ==================== VIEW: COLLECTION (MANAGER) ==================== -->
+        <div id="view-collection" class="hidden fade-in pb-20">
+            <!-- Tabs -->
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-3xl font-bold text-emerald-900">Mon Portfolio</h2>
+                <button onclick="openCollectionForm()" class="bg-emerald-600 text-white px-4 py-2 rounded-lg font-bold shadow-md hover:bg-emerald-500 transition flex items-center gap-2">
+                    + Ajouter
+                </button>
+            </div>
+
+            <!-- List -->
+            <div id="collection-list" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                <!-- Items injected here -->
+            </div>
+            
+            <div id="empty-state" class="hidden text-center py-20 text-slate-400">
+                <div class="text-6xl mb-4">📭</div>
+                <p>Votre collection est vide. Ajoutez votre première dégustation !</p>
+            </div>
+        </div>
+
+    </main>
+
+
+    <!-- MODAL FORM COLLECTION -->
+    <div id="collection-modal" class="hidden fixed inset-0 z-[100] bg-black/50 backdrop-blur-sm flex items-center justify-center p-4">
+        <div class="bg-white w-full max-w-lg rounded-2xl shadow-2xl p-6 max-h-[90vh] overflow-y-auto">
+            <h3 class="text-2xl font-bold text-slate-800 mb-6">Ajouter à la collection</h3>
+            <form id="collection-form" onsubmit="handleCollectionSubmit(event)" class="space-y-4">
+                
+                <!-- Category -->
+                <div class="grid grid-cols-2 gap-4">
+                    <div class="space-y-1">
+                        <label class="text-xs font-bold text-slate-500 uppercase">Catégorie</label>
+                        <select name="category" class="input-field" onchange="toggleFormFields(this.value)">
+                            <option value="weed">🥦 Weed (Fleur)</option>
+                            <option value="hash">🍫 Hash (Résine)</option>
+                        </select>
+                    </div>
+                    <div class="space-y-1">
+                        <label class="text-xs font-bold text-slate-500 uppercase">Quantité (g)</label>
+                        <input type="number" step="0.1" name="quantity" class="input-field" placeholder="ex: 3.5">
+                    </div>
+                </div>
+
+                <!-- Hash Specific Fields -->
+                <div id="hash-fields" class="hidden bg-amber-50 p-3 rounded-lg border border-amber-100 mb-2">
+                    <label class="text-xs font-bold text-amber-600 uppercase mb-1 block">Type de Hash</label>
+                    <input type="text" name="hashType" class="input-field border-amber-200 focus:border-amber-500" placeholder="ex: Dry Sift, Static, Frozen...">
+                </div>
+
+                <!-- Names -->
+                <div class="space-y-1">
+                    <label class="text-xs font-bold text-slate-500 uppercase">Variété (Strain)</label>
+                    <input type="text" name="strain" class="input-field font-bold" placeholder="ex: Gelato #41" required>
+                </div>
+                
+                <div class="space-y-1">
+                    <label class="text-xs font-bold text-slate-500 uppercase">Nom Commercial (Opt.)</label>
+                    <input type="text" name="commercialName" class="input-field" placeholder="ex: Blue Magic">
+                </div>
+
+                <!-- Origin -->
+                <div class="grid grid-cols-2 gap-4">
+                    <div class="space-y-1">
+                        <label class="text-xs font-bold text-slate-500 uppercase">Pays</label>
+                        <input type="text" name="country" id="input-country" class="input-field" placeholder="ex: Espagne" oninput="updateFlagPreview()">
+                        <div id="flag-preview" class="text-right text-2xl absolute right-8 mt-[-35px] pointer-events-none">🏳️</div>
+                    </div>
+                    <div class="space-y-1">
+                        <label class="text-xs font-bold text-slate-500 uppercase">Producteur / Farm</label>
+                        <input type="text" name="farm" class="input-field" placeholder="ex: The Grateful Seeds">
+                    </div>
+                </div>
+
+                <div class="space-y-1">
+                    <label class="text-xs font-bold text-slate-500 uppercase">Prix Total (€)</label>
+                    <input type="number" name="price" class="input-field" placeholder="ex: 50">
+                </div>
+
+                <!-- Photo -->
+                <div class="space-y-1">
+                    <label class="text-xs font-bold text-slate-500 uppercase">Photo</label>
+                    <div class="flex items-center gap-4">
+                        <label class="w-20 h-20 border-2 border-dashed border-slate-300 rounded-xl flex items-center justify-center cursor-pointer hover:bg-slate-50 transition text-slate-400">
+                            📷
+                            <input type="file" id="photo-input" class="hidden" accept="image/*" onchange="previewImage(this)">
+                        </label>
+                        <div id="image-preview-container" class="w-20 h-20 rounded-xl bg-slate-100 overflow-hidden hidden border border-slate-200">
+                            <img id="img-preview" class="w-full h-full object-cover">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flex gap-3 pt-4">
+                    <button type="button" onclick="closeCollectionForm()" class="flex-1 py-3 rounded-xl border border-slate-300 text-slate-500 font-bold">Annuler</button>
+                    <button type="submit" class="flex-1 py-3 rounded-xl bg-emerald-600 text-white font-bold hover:bg-emerald-500">Sauvegarder</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+
+    <script>
+        // --- DATA & LOGIC ---
+
+        const masterData = {
+            // ... (Copiez ici exactement le même objet masterData que l'application précédente)
+            // Pour l'exemple, je mets une version condensée, assurez-vous d'avoir tout le contenu
+            hash_dry: { name: "Dry Sift", color: "amber", hex: "#D97706", badge: "Tradition", icon: "🏜️", desc: "Tamisage mécanique ancestral.", process: [{t:"Séchage",d:"Plante affinée"},{t:"Tamisage",d:"Frottement"},{t:"Collection",d:"Poudre dorée"},{t:"Presse",d:"Chaleur"}], radar: [30,90,70,50,60], metrics: [20,50,40,30], metricsLabels: ['Rendement','Puissance','Prix','Tech'], matrix: {x:45,y:9} },
+            hash_water: { name: "Ice-O-Lator", color: "blue", hex: "#2563EB", badge: "Pureté", icon: "❄️", desc: "Extraction eau glacée + Fresh Frozen.", process: [{t:"Congélation",d:"-40°C"},{t:"Lavage",d:"Eau+Glace"},{t:"Filtre",d:"Sacs microns"},{t:"Séchage",d:"Lyophilisation"}], radar: [90,30,60,95,85], metrics: [10,75,90,80], metricsLabels: ['Rendement','Puissance','Prix','Tech'], matrix: {x:70,y:6} },
+            hash_rosin: { name: "Rosin", color: "purple", hex: "#9333EA", badge: "Excellence", icon: "🔥", desc: "Pression et chaleur uniquement.", process: [{t:"Matériel",d:"Hash 6*"},{t:"Sac",d:"25u Nylon"},{t:"Presse",d:"Hydraulique"},{t:"Cure",d:"Cold Cure"}], radar: [85,50,80,90,95], metrics: [15,85,100,60], metricsLabels: ['Rendement','Puissance','Prix','Tech'], matrix: {x:85,y:3} },
+            weed_indica: { name: "Indica (Kush)", color: "indigo", hex: "#4F46E5", badge: "Relax", icon: "🏔️", desc: "Montagnes, effet lourd.", process: [{t:"Origine",d:"Hindu Kush"},{t:"Structure",d:"Buisson"},{t:"Flo",d:"8 sem"},{t:"Effet",d:"Physique"}], radar: [20,80,90,60,40], metrics: [80,22,50,90], metricsLabels: ['Rendement','THC','Taille','Facilité'], matrix: {x:20,y:10} },
+            weed_sativa: { name: "Sativa (Haze)", color: "yellow", hex: "#D97706", badge: "Energie", icon: "☀️", desc: "Tropiques, effet high.", process: [{t:"Origine",d:"Equateur"},{t:"Structure",d:"Géante"},{t:"Flo",d:"12+ sem"},{t:"Effet",d:"Cérébral"}], radar: [60,40,20,70,40], metrics: [90,18,100,60], metricsLabels: ['Rendement','THC','Taille','Facilité'], matrix: {x:18,y:10} },
+            weed_exotic: { name: "Exotics", color: "pink", hex: "#DB2777", badge: "Hybride", icon: "🧬", desc: "Breeding US moderne, goût dessert.", process: [{t:"Origine",d:"Indoor/Lab"},{t:"Structure",d:"Optimisée"},{t:"Flo",d:"9 sem"},{t:"Effet",d:"Mixte"}], radar: [80,50,60,80,50], metrics: [75,28,60,70], metricsLabels: ['Rendement','THC','Taille','Facilité'], matrix: {x:28,y:10} }
+        };
+
+        // --- NAVIGATION ---
+        function showView(viewId) {
+            document.querySelectorAll('[id^="view-"]').forEach(el => el.classList.add('hidden'));
+            document.getElementById(`view-${viewId}`).classList.remove('hidden');
+            document.getElementById('navBackBtn').classList.toggle('hidden', viewId === 'home');
+            window.scrollTo(0,0);
+            
+            // Render Collection if opened
+            if(viewId === 'collection') renderCollectionList();
+        }
+
+        // --- ENCYCLOPEDIA CHARTS ---
+        // (Charts initialization logic remains mostly same, simplified for brevity)
+        const initCharts = () => {
+            new Chart(document.getElementById('potencyChart'), {
+                type: 'bar',
+                data: {
+                    labels: ['Sativa', 'Indica', 'Exotic', 'Dry Sift', 'Ice-O-Lator', 'Rosin', 'BHO'],
+                    datasets: [{ label: '% THC', data: [15,20,28,40,65,75,90], backgroundColor: ['#10B981','#10B981','#10B981','#D97706','#2563EB','#9333EA','#64748B'], borderRadius: 4 }]
+                },
+                options: { indexAxis: 'y', responsive: true, maintainAspectRatio: false, plugins: {legend:false} }
+            });
+
+            // Populate Selects
+            const sA = document.getElementById('selectA'), sB = document.getElementById('selectB');
+            Object.keys(masterData).forEach(k => {
+                sA.add(new Option(masterData[k].name, k));
+                sB.add(new Option(masterData[k].name, k));
+            });
+            sA.value = "weed_sativa"; sB.value = "hash_rosin";
+            updateComparator();
+
+            // Matrix
+            const trace = {
+                x: Object.values(masterData).map(d => d.matrix.x),
+                y: Object.values(masterData).map(d => d.matrix.y),
+                text: Object.values(masterData).map(d => d.name),
+                mode: 'markers+text', type: 'scatter', textposition: 'top center',
+                marker: { size: 30, color: Object.values(masterData).map(d => d.hex) }
+            };
+            Plotly.newPlot('globalMatrixPlot', [trace], { xaxis: {title:'Pureté', range:[0,100]}, yaxis: {title:'Solidité', range:[0,12]}, margin:{t:20,l:40}, paper_bgcolor:'rgba(0,0,0,0)', plot_bgcolor:'rgba(0,0,0,0)' }, {displayModeBar:false});
+        };
+
+        let comparatorChart;
+        function updateComparator() {
+            const dA = masterData[document.getElementById('selectA').value];
+            const dB = masterData[document.getElementById('selectB').value];
+            if(comparatorChart) comparatorChart.destroy();
+            comparatorChart = new Chart(document.getElementById('comparatorRadar'), {
+                type: 'radar',
+                data: {
+                    labels: ['Fruité', 'Terreux', 'Physique', 'Odeur', 'Intensité'],
+                    datasets: [
+                        { label: dA.name, data: dA.radar, borderColor: '#3B82F6', backgroundColor: 'rgba(59,130,246,0.2)' },
+                        { label: dB.name, data: dB.radar, borderColor: '#EC4899', backgroundColor: 'rgba(236,72,153,0.2)' }
+                    ]
+                },
+                options: { responsive: true, maintainAspectRatio: false, scales: { r: { suggestedMin:0, suggestedMax:100 } } }
+            });
+        }
+
+        let detailCharts = [];
+        function showDetail(key) {
+            const d = masterData[key];
+            showView('detail');
+            
+            // Populate
+            const header = document.getElementById('detail-header');
+            header.className = `bg-white p-8 rounded-2xl shadow-lg border-t-8 border-${d.color}-500`;
+            document.getElementById('detail-badge').innerText = d.badge;
+            document.getElementById('detail-badge').className = `px-3 py-1 rounded-full text-sm font-bold uppercase mb-2 inline-block bg-${d.color}-100 text-${d.color}-800`;
+            document.getElementById('detail-title').innerText = d.name;
+            document.getElementById('detail-title').className = `text-4xl md:text-5xl font-black text-${d.color}-900`;
+            document.getElementById('detail-icon').innerText = d.icon;
+            document.getElementById('detail-desc').innerText = d.desc;
+            document.getElementById('detail-desc').className = `text-lg text-slate-600 border-l-4 border-${d.color}-200 pl-4`;
+
+            // Process
+            document.getElementById('detail-flow').innerHTML = d.process.map((s, i) => `
+                <div class="bg-slate-700 p-4 rounded-lg border border-slate-600">
+                    <div class="text-xs text-${d.color}-400 font-mono uppercase">${s.t}</div>
+                    <div class="font-bold">${s.d}</div>
+                </div>
+            `).join('');
+
+            // Charts
+            detailCharts.forEach(c => c.destroy());
+            detailCharts = [
+                new Chart(document.getElementById('detailRadarChart'), {
+                    type: 'radar',
+                    data: { labels: ['Fruité','Terreux','Physique','Odeur','Intensité'], datasets: [{ label: d.name, data: d.radar, backgroundColor: `${d.hex}33`, borderColor: d.hex, fill: true }] },
+                    options: { maintainAspectRatio: false, plugins: {legend:false} }
+                }),
+                new Chart(document.getElementById('detailBarChart'), {
+                    type: 'bar',
+                    data: { labels: d.metricsLabels, datasets: [{ data: d.metrics, backgroundColor: d.hex, borderRadius: 6 }] },
+                    options: { maintainAspectRatio: false, plugins: {legend:false}, scales: {y:{max:100}} }
+                })
+            ];
+        }
+
+        // --- COLLECTION LOGIC (No Auth, LocalStorage) ---
+
+        const STORAGE_KEY = 'green_codex_collection';
+        let collection = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
+        let currentImageBase64 = null;
+
+        function saveCollection() {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(collection));
+            updateDashboardStats();
+            renderCollectionList();
+        }
+
+        function updateDashboardStats() {
+            document.getElementById('stats-total').innerText = collection.length;
+            document.getElementById('stats-weed').innerText = collection.filter(i => i.category === 'weed').length;
+            document.getElementById('stats-hash').innerText = collection.filter(i => i.category === 'hash').length;
+            const totalVal = collection.reduce((acc, curr) => acc + (parseFloat(curr.price) || 0), 0);
+            document.getElementById('stats-value').innerText = totalVal + '€';
+        }
+
+        function getFlag(countryName) {
+            if(!countryName) return '🏳️';
+            const map = {
+                'france': '🇫🇷', 'espagne': '🇪🇸', 'spain': '🇪🇸', 'usa': '🇺🇸', 'us': '🇺🇸', 'cali': '🇺🇸', 'californie': '🇺🇸',
+                'maroc': '🇲🇦', 'morocco': '🇲🇦', 'pays-bas': '🇳🇱', 'hollande': '🇳🇱', 'netherlands': '🇳🇱', 'suisse': '🇨🇭',
+                'italie': '🇮🇹', 'canada': '🇨🇦', 'royaume-uni': '🇬🇧', 'uk': '🇬🇧', 'angleterre': '🇬🇧', 'belgique': '🇧🇪',
+                'allemagne': '🇩🇪', 'portugal': '🇵🇹', 'colombie': '🇨🇴', 'thailande': '🇹🇭'
+            };
+            const lower = countryName.toLowerCase().trim();
+            // Recherche par mot clé
+            for (const [key, val] of Object.entries(map)) {
+                if (lower.includes(key)) return val;
+            }
+            return '🏳️'; // Default
+        }
+
+        function renderCollectionList() {
+            const container = document.getElementById('collection-list');
+            container.innerHTML = '';
+            
+            if(collection.length === 0) {
+                document.getElementById('empty-state').classList.remove('hidden');
+                return;
+            } else {
+                document.getElementById('empty-state').classList.add('hidden');
+            }
+
+            collection.forEach((item, index) => {
+                const isHash = item.category === 'hash';
+                const emoji = isHash ? '🍫' : '🥦';
+                const html = `
+                <div class="bg-white rounded-xl shadow-sm border border-slate-100 p-4 flex gap-4 relative overflow-hidden group hover:border-emerald-300 transition">
+                    <div class="w-20 h-20 rounded-lg bg-slate-100 flex-shrink-0 overflow-hidden">
+                        ${item.image ? `<img src="${item.image}" class="w-full h-full object-cover">` : `<div class="w-full h-full flex items-center justify-center text-3xl opacity-30">${emoji}</div>`}
+                    </div>
+                    <div class="flex-1 min-w-0">
+                        <div class="flex justify-between items-start">
+                            <h3 class="font-bold text-slate-800 truncate pr-2">${item.strain}</h3>
+                            <span class="text-xl">${getFlag(item.country)}</span>
+                        </div>
+                        <p class="text-xs text-slate-500 font-bold uppercase mb-1">${item.commercialName || item.farm || 'Inconnu'}</p>
+                        ${isHash && item.type ? `<span class="bg-amber-100 text-amber-800 text-[10px] px-1.5 py-0.5 rounded border border-amber-200 block w-fit mb-1">${item.type}</span>` : ''}
+                        <div class="flex items-center gap-2 mt-auto">
+                             <span class="bg-emerald-50 text-emerald-700 text-xs px-2 py-1 rounded font-bold">${item.quantity}g</span>
+                             <span class="text-xs text-slate-400 font-bold">${item.price ? item.price+'€' : '-'}</span>
+                             <button onclick="deleteItem(${index})" class="ml-auto text-red-400 hover:text-red-600 p-1"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg></button>
+                        </div>
+                    </div>
+                </div>`;
+                container.insertAdjacentHTML('beforeend', html);
+            });
+        }
+
+        // --- FORM HANDLING ---
+
+        function openCollectionForm() {
+            document.getElementById('collection-form').reset();
+            document.getElementById('image-preview-container').classList.add('hidden');
+            document.getElementById('hash-fields').classList.add('hidden'); // Reset to hidden
+            currentImageBase64 = null;
+            document.getElementById('collection-modal').classList.remove('hidden');
+        }
+
+        function closeCollectionForm() {
+            document.getElementById('collection-modal').classList.add('hidden');
+        }
+
+        // New function to handle category switch
+        function toggleFormFields(category) {
+            const hashFields = document.getElementById('hash-fields');
+            if(category === 'hash') {
+                hashFields.classList.remove('hidden');
+            } else {
+                hashFields.classList.add('hidden');
+            }
+        }
+
+        function updateFlagPreview() {
+            const val = document.getElementById('input-country').value;
+            document.getElementById('flag-preview').innerText = getFlag(val);
+        }
+
+        function previewImage(input) {
+            if (input.files && input.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    currentImageBase64 = e.target.result;
+                    document.getElementById('img-preview').src = e.target.result;
+                    document.getElementById('image-preview-container').classList.remove('hidden');
+                }
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
+
+        function handleCollectionSubmit(e) {
+            e.preventDefault();
+            const formData = new FormData(e.target);
+            const newItem = {
+                category: formData.get('category'),
+                quantity: formData.get('quantity'),
+                strain: formData.get('strain'),
+                commercialName: formData.get('commercialName'),
+                type: formData.get('hashType'), // Capture hash type
+                country: formData.get('country'),
+                farm: formData.get('farm'),
+                price: formData.get('price'),
+                image: currentImageBase64,
+                date: new Date().toISOString()
+            };
+            
+            collection.unshift(newItem); // Add to top
+            saveCollection();
+            closeCollectionForm();
+        }
+
+        function deleteItem(index) {
+            if(confirm('Supprimer cette entrée ?')) {
+                collection.splice(index, 1);
+                saveCollection();
+            }
+        }
+
+        // --- INITIALIZATION ---
+        window.addEventListener('load', () => {
+            initCharts();
+            updateDashboardStats();
+        });
+
+    </script>
+</body>
+</html>
