@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>The Green Codex : Encyclopédie & Collection</title>
+    <title>The Green Codex V3 : Encyclopédie & Collection</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.plot.ly/plotly-2.27.0.min.js"></script>
@@ -32,6 +32,7 @@
         /* Inputs */
         .input-field { width: 100%; padding: 12px; border-radius: 0.75rem; border: 1px solid #e2e8f0; background: #fff; outline: none; transition: border-color 0.2s; }
         .input-field:focus { border-color: #10b981; ring: 2px solid #10b981; }
+        textarea.input-field { min-height: 100px; resize: vertical; }
 
         /* Edit Mode Styles */
         .editable-highlight { border: 2px dashed #F59E0B; cursor: text; padding: 2px; border-radius: 4px; position: relative; }
@@ -218,7 +219,7 @@
 
             <!-- ADD SECTION BUTTON (Edit Mode Only) -->
             <div id="add-section-area" class="hidden text-center py-10 border-t border-dashed border-slate-300">
-                <button onclick="addNewSection()" class="bg-amber-500 hover:bg-amber-600 text-white px-6 py-3 rounded-full font-bold shadow-lg transition transform hover:scale-105">
+                <button onclick="openSectionModal()" class="bg-amber-500 hover:bg-amber-600 text-white px-6 py-3 rounded-full font-bold shadow-lg transition transform hover:scale-105">
                     + Ajouter une Section
                 </button>
             </div>
@@ -338,6 +339,32 @@
     </div>
 
 
+    <!-- MODAL NEW SECTION -->
+    <div id="section-modal" class="hidden fixed inset-0 z-[100] bg-black/50 backdrop-blur-sm flex items-center justify-center p-4">
+        <div class="bg-white w-full max-w-lg rounded-2xl shadow-2xl p-6">
+            <h3 class="text-2xl font-bold text-slate-800 mb-6">Ajouter une Section</h3>
+            <form id="section-form" onsubmit="handleSectionSubmit(event)" class="space-y-4">
+                <div class="space-y-1">
+                    <label class="text-xs font-bold text-slate-500 uppercase">Titre</label>
+                    <input type="text" name="secTitle" class="input-field font-bold" required>
+                </div>
+                <div class="space-y-1">
+                    <label class="text-xs font-bold text-slate-500 uppercase">Contenu</label>
+                    <textarea name="secText" class="input-field" required></textarea>
+                </div>
+                <div class="space-y-1">
+                    <label class="text-xs font-bold text-slate-500 uppercase">Image (Optionnel)</label>
+                    <input type="file" id="sec-photo-input" class="input-field" accept="image/*">
+                </div>
+                <div class="flex gap-3 pt-4">
+                    <button type="button" onclick="closeSectionModal()" class="flex-1 py-3 rounded-xl border border-slate-300 text-slate-500 font-bold">Annuler</button>
+                    <button type="submit" class="flex-1 py-3 rounded-xl bg-amber-500 text-white font-bold hover:bg-amber-600">Ajouter</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+
     <script>
         // --- CORE DATA & STATE ---
         const masterData = {
@@ -361,9 +388,30 @@
             document.querySelectorAll('[id^="view-"]').forEach(el => el.classList.add('hidden'));
             document.getElementById(`view-${viewId}`).classList.remove('hidden');
             document.getElementById('navBackBtn').classList.toggle('hidden', viewId === 'home');
-            document.getElementById('editModeBtn').classList.toggle('hidden', viewId !== 'home'); // Edit mode only on home
+            document.getElementById('editModeBtn').classList.toggle('hidden', viewId !== 'home'); 
             window.scrollTo(0,0);
             if(viewId === 'collection') renderCollectionList();
+        }
+
+        // --- COMPRESSION UTILITY ---
+        function compressImage(file, maxWidth = 800, quality = 0.6) {
+            return new Promise((resolve) => {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    const img = new Image();
+                    img.onload = () => {
+                        const canvas = document.createElement('canvas');
+                        let w = img.width, h = img.height;
+                        if (w > maxWidth) { h *= maxWidth / w; w = maxWidth; }
+                        canvas.width = w; canvas.height = h;
+                        const ctx = canvas.getContext('2d');
+                        ctx.drawImage(img, 0, 0, w, h);
+                        resolve(canvas.toDataURL('image/jpeg', quality));
+                    };
+                    img.src = e.target.result;
+                };
+                reader.readAsDataURL(file);
+            });
         }
 
         // --- EDIT MODE LOGIC ---
@@ -374,7 +422,6 @@
             document.getElementById('editModeBtn').classList.toggle('bg-amber-500', isEditMode);
             document.getElementById('add-section-area').classList.toggle('hidden', !isEditMode);
             
-            // Toggle Content Editable triggers
             document.querySelectorAll('[data-editable]').forEach(el => {
                 if(isEditMode) {
                     el.classList.add('editable-highlight');
@@ -384,8 +431,6 @@
                     el.onclick = null;
                 }
             });
-
-            // Toggle Custom Sections Delete buttons
             renderCustomSections();
         }
 
@@ -408,15 +453,37 @@
             renderCustomSections();
         }
 
-        function addNewSection() {
-            const title = prompt("Titre de la nouvelle section :");
-            if(!title) return;
-            const text = prompt("Contenu du texte :");
-            if(!text) return;
+        // --- SECTION MODAL LOGIC ---
+        function openSectionModal() {
+            document.getElementById('section-form').reset();
+            document.getElementById('section-modal').classList.remove('hidden');
+        }
+
+        function closeSectionModal() {
+            document.getElementById('section-modal').classList.add('hidden');
+        }
+
+        async function handleSectionSubmit(e) {
+            e.preventDefault();
+            const form = e.target;
+            const title = form.secTitle.value;
+            const text = form.secText.value;
+            const fileInput = document.getElementById('sec-photo-input');
+            let image = null;
+
+            if (fileInput.files.length > 0) {
+                image = await compressImage(fileInput.files[0]);
+            }
             
-            customSections.push({ title, text, id: Date.now() });
-            localStorage.setItem('green_codex_custom_sections', JSON.stringify(customSections));
-            renderCustomSections();
+            customSections.push({ title, text, image, id: Date.now() });
+            try {
+                localStorage.setItem('green_codex_custom_sections', JSON.stringify(customSections));
+                renderCustomSections();
+                closeSectionModal();
+            } catch (err) {
+                alert("Erreur de stockage : Image trop lourde ou espace plein.");
+                customSections.pop(); // Revert
+            }
         }
 
         function deleteCustomSection(id) {
@@ -430,12 +497,12 @@
             const container = document.getElementById('custom-sections-container');
             container.innerHTML = '';
             customSections.forEach((sec, index) => {
-                // FIXED STYLE: Matches standard sections (border-emerald-600, section-title class)
                 const html = `
                     <section class="bg-white rounded-2xl shadow-md p-8 border-l-8 border-emerald-600 relative group animate-fade-in">
                         ${isEditMode ? `<button onclick="deleteCustomSection(${sec.id})" class="absolute top-4 right-4 text-red-500 font-bold border border-red-200 px-3 py-1 rounded hover:bg-red-50 text-xs transition">Supprimer</button>` : ''}
                         <h2 class="section-title">${index + 8}. ${sec.title}</h2>
-                        <p class="text-lg leading-relaxed text-slate-600">${sec.text}</p>
+                        ${sec.image ? `<img src="${sec.image}" class="w-full max-h-96 object-cover rounded-xl mb-6 shadow-sm">` : ''}
+                        <p class="text-lg leading-relaxed text-slate-600 whitespace-pre-wrap">${sec.text}</p>
                     </section>
                 `;
                 container.insertAdjacentHTML('beforeend', html);
@@ -478,26 +545,29 @@
             document.getElementById('detail-desc').innerText = d.desc;
             document.getElementById('detail-desc').className = `text-lg text-slate-600 border-l-4 border-${d.color}-200 pl-4`;
             document.getElementById('detail-flow').innerHTML = d.process.map(s => `<div class="bg-slate-700 p-4 rounded-lg border border-slate-600"><div class="text-xs text-${d.color}-400 font-mono uppercase">${s.t}</div><div class="font-bold">${s.d}</div></div>`).join('');
-            // Charts (Simplified re-creation)
             const cvs1 = document.getElementById('detailRadarChart'); const cvs2 = document.getElementById('detailBarChart');
             if(cvs1.chart) cvs1.chart.destroy(); if(cvs2.chart) cvs2.chart.destroy();
             cvs1.chart = new Chart(cvs1, { type: 'radar', data: { labels: ['Fruité','Terreux','Physique','Odeur','Intensité'], datasets: [{ label: d.name, data: d.radar, backgroundColor: `${d.hex}33`, borderColor: d.hex, fill: true }] }, options: { maintainAspectRatio: false, plugins: {legend:false} } });
             cvs2.chart = new Chart(cvs2, { type: 'bar', data: { labels: ['Rendement','Puissance','Prix','Tech'], datasets: [{ data: d.metrics, backgroundColor: d.hex, borderRadius: 6 }] }, options: { maintainAspectRatio: false, plugins: {legend:false}, scales: {y:{max:100}} } });
         }
 
-        // --- COLLECTION MANAGER (MULTI PHOTOS & EDIT) ---
+        // --- COLLECTION MANAGER (FIXED: COMPRESSION + ERROR HANDLING) ---
 
         function saveCollection() {
-            localStorage.setItem('green_codex_collection', JSON.stringify(collection));
-            updateDashboardStats();
-            renderCollectionList();
+            try {
+                localStorage.setItem('green_codex_collection', JSON.stringify(collection));
+                updateDashboardStats();
+                renderCollectionList();
+            } catch (e) {
+                alert("Espace de stockage plein ! Essayez de supprimer des éléments ou de réduire la taille des photos.");
+                // Revert change if possible, or just alert
+            }
         }
 
         function updateDashboardStats() {
             document.getElementById('stats-total').innerText = collection.length;
             document.getElementById('stats-weed').innerText = collection.filter(i => i.category === 'weed').length;
             document.getElementById('stats-hash').innerText = collection.filter(i => i.category === 'hash').length;
-            // UPDATE: Mass instead of Price
             const totalMass = collection.reduce((acc, curr) => acc + (parseFloat(curr.quantity) || 0), 0);
             document.getElementById('stats-mass').innerText = totalMass.toFixed(1) + 'g';
         }
@@ -546,7 +616,7 @@
             });
         }
 
-        // --- FORM HANDLING (MULTI PHOTOS & EDIT) ---
+        // --- FORM HANDLING (COMPRESSED) ---
 
         function openCollectionForm(editIndex = -1) {
             const form = document.getElementById('collection-form');
@@ -562,12 +632,10 @@
                 document.getElementById('inp-strain').value = item.strain;
                 document.getElementById('inp-commercialName').value = item.commercialName;
                 document.getElementById('inp-country').value = item.country;
-                if(item.farm) document.getElementById('inp-farm').value = item.farm; // Fixed missing ID
+                if(item.farm) document.getElementById('inp-farm').value = item.farm; 
                 document.getElementById('inp-price').value = item.price;
                 if(item.type) document.getElementById('inp-hashType').value = item.type;
                 toggleFormFields(item.category);
-                
-                // Load existing photos
                 if(item.photos) currentPhotos = [...item.photos];
             } else {
                 toggleFormFields('weed');
@@ -585,20 +653,17 @@
             document.getElementById('hash-fields').classList.toggle('hidden', category !== 'hash');
         }
 
-        function handlePhotos(input) {
+        async function handlePhotos(input) {
             if (input.files) {
                 const remainingSlots = 3 - currentPhotos.length;
                 if(remainingSlots <= 0) { alert("Max 3 photos !"); return; }
                 
                 const files = Array.from(input.files).slice(0, remainingSlots);
-                files.forEach(file => {
-                    const reader = new FileReader();
-                    reader.onload = (e) => {
-                        currentPhotos.push(e.target.result);
-                        renderPhotoPreviews();
-                    };
-                    reader.readAsDataURL(file);
-                });
+                for (const file of files) {
+                    const compressed = await compressImage(file);
+                    currentPhotos.push(compressed);
+                }
+                renderPhotoPreviews();
             }
         }
 
