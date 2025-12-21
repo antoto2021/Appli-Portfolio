@@ -4,8 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="apple-mobile-web-app-title" content="Green Codex">
+    <meta name="apple-mobile-web-app-title" content="Green Codex">
     <link rel="apple-touch-icon" href="logo appli.png">
     <link rel="icon" type="image/png" href="logo appli.png">
+
     <title>Green Codex</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
@@ -22,13 +24,6 @@
         .fade-in { animation: fadeIn 0.4s ease-in-out; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-        /* Flowchart */
-        .flow-box { position: relative; transition: all 0.3s; }
-        .flow-arrow::after { content: '▼'; position: absolute; bottom: -25px; left: 50%; transform: translateX(-50%); color: #059669; font-size: 1.2rem; }
-        @media (min-width: 768px) {
-            .flow-arrow-md::after { content: '▶'; top: 50%; right: -25px; bottom: auto; left: auto; transform: translateY(-50%); }
-        }
-
         /* Interactive Cards */
         .card-interactive { cursor: pointer; transition: all 0.3s ease; }
         .card-interactive:hover { transform: translateY(-5px); box-shadow: 0 10px 20px rgba(0,0,0,0.1); }
@@ -40,25 +35,10 @@
 
         /* Edit Mode Styles */
         .editable-highlight { 
-            border: 2px dashed #F59E0B; 
-            cursor: text; 
-            border-radius: 4px; 
-            position: relative; 
-            background-color: rgba(254, 243, 199, 0.3);
+            border: 2px dashed #F59E0B; cursor: text; border-radius: 4px; position: relative; background-color: rgba(254, 243, 199, 0.3);
         }
         .editable-highlight:hover::after { 
-            content: '✎ Modifier'; 
-            position: absolute; 
-            top: -20px; 
-            right: 0; 
-            background: #F59E0B; 
-            color: white; 
-            font-size: 10px; 
-            padding: 2px 6px; 
-            border-radius: 4px; 
-            pointer-events: none; 
-            z-index: 50;
-            font-weight: bold;
+            content: '✎ Modifier'; position: absolute; top: -20px; right: 0; background: #F59E0B; color: white; font-size: 10px; padding: 2px 6px; border-radius: 4px; pointer-events: none; z-index: 50; font-weight: bold;
         }
         .edit-mode-active body { border-top: 4px solid #F59E0B; }
 
@@ -97,9 +77,9 @@
         <!-- ==================== VIEW: HOME ==================== -->
         <div id="view-home" class="fade-in space-y-16">
             
-            <!-- 1. INTRO (JUSTIFIÉ) -->
+            <!-- 1. INTRO -->
             <section class="bg-white rounded-2xl shadow-md p-8 border-l-8 border-emerald-600">
-                <h2 class="section-title" data-editable="intro_title">1. L'Odyssée de la Plante</h2>
+                <h2 class="section-title" data-editable="intro_title">L'Odyssée de la Plante</h2>
                 <div class="text-lg leading-relaxed text-slate-600 space-y-4 text-justify" data-editable="intro_text">
                     <p>L'histoire du Cannabis Sativa L. est une épopée botanique qui traverse les millénaires. Des steppes d'Asie Centrale où elle fut domestiquée il y a plus de 10 000 ans, jusqu'aux laboratoires high-tech de Californie, cette plante a façonné des cultures entières.</p>
                     <p>Historiquement, deux grandes traditions s'opposent et se complètent : la culture de la <strong>Fleur (Weed)</strong>, séchée et affinée pour ses arômes complexes, et l'art du <strong>Hashish</strong>, né au Moyen-Orient et en Asie, qui consiste à séparer mécaniquement les trichomes pour obtenir un concentré pur et stable.</p>
@@ -107,13 +87,13 @@
                 </div>
             </section>
 
-            <!-- 2. MY COLLECTION -->
+            <!-- 2. MY COLLECTION PREVIEW -->
             <section id="my-collection-preview" class="bg-slate-900 rounded-2xl p-8 text-white relative overflow-hidden shadow-xl">
                 <div class="absolute top-0 right-0 w-64 h-64 bg-emerald-500 rounded-full blur-[80px] opacity-20 pointer-events-none"></div>
                 <div class="relative z-10">
                     <div class="flex justify-between items-end mb-6">
                         <div>
-                            <h2 class="text-3xl font-bold text-white mb-2" data-editable="col_title">2. Ma Collection</h2>
+                            <h2 class="text-3xl font-bold text-white mb-2" data-editable="col_title">My Collection</h2>
                             <p class="text-slate-400" data-editable="col_sub">Votre carnet de dégustation et d'archivage personnel.</p>
                         </div>
                         <button onclick="showView('collection')" class="bg-emerald-500 hover:bg-emerald-400 text-white px-6 py-3 rounded-xl font-bold transition shadow-lg flex items-center gap-2">
@@ -141,12 +121,12 @@
                 </div>
             </section>
 
-            <!-- 3. FAMILLES (JUSTIFIÉ) -->
+            <!-- 3. FAMILLES -->
             <section>
                 <div class="mb-8 border-b border-slate-200 pb-4">
-                    <h2 class="section-title" data-editable="fam_title">3. Les Familles Fondamentales</h2>
+                    <h2 class="section-title" data-editable="fam_title">Les Familles Fondamentales</h2>
                     <p class="text-slate-600 max-w-3xl text-justify" data-editable="fam_desc">
-                        Le marché moderne se divise en deux grands royaumes : la fleur brute et les extractions. Chacun possède ses méthodes, ses rituels et ses profils aromatiques distincts. Voici les standards de l'industrie actuelle.
+                        Le marché moderne se divise en deux grands royaumes : la fleur brute et les extractions. Chacun possède ses méthodes, ses rituels et ses profils aromatiques distincts.
                     </p>
                 </div>
 
@@ -162,13 +142,13 @@
                     <div onclick="showDetail('hash_water')" class="bg-white p-6 rounded-xl shadow-md border-t-4 border-blue-500 card-interactive group">
                         <div class="flex justify-between"> <div class="text-4xl mb-4">❄️</div> <span class="text-xs font-bold text-blue-600 bg-blue-50 px-2 py-1 rounded h-fit">PURETÉ</span> </div>
                         <h3 class="text-xl font-bold text-slate-800 group-hover:text-blue-600">Ice-O-Lator</h3>
-                        <p class="text-sm text-slate-500 mt-2">Extraction à l'eau et glace (Solventless), utilise l'eau glacée pour extraire les trichomes. Le froid rend les glandes de résine cassantes, facilitant leur 
-                            séparation par agitation. Le mélange est ensuite filtré à travers plusieurs sacs aux mailles de plus en plus serrées pour obtenir de l'Ice-O-Lator ou Bubble Hash.</p>
+                        <p class="text-sm text-slate-500 mt-2">Extraction à l'eau et glace (Solventless), utilise l'eau glacée pour extraire les trichomes. Le froid rend les glandes de résine cassantes, facilitant 
+                            leur séparation par agitation. Le mélange est ensuite filtré à travers plusieurs sacs aux mailles de plus en plus serrées pour obtenir de l'Ice-O-Lator ou Bubble Hash.</p>
                     </div>
                     <div onclick="showDetail('hash_rosin')" class="bg-white p-6 rounded-xl shadow-md border-t-4 border-purple-500 card-interactive group">
                         <div class="flex justify-between"> <div class="text-4xl mb-4">🔥</div> <span class="text-xs font-bold text-purple-600 bg-purple-50 px-2 py-1 rounded h-fit">MODERNE</span> </div>
                         <h3 class="text-xl font-bold text-slate-800 group-hover:text-purple-600">Rosin</h3>
-                        <p class="text-sm text-slate-500 mt-2">PUne extraction 100 % naturelle obtenue par pression mécanique. En appliquant simultanément de la chaleur et une forte pression sur des fleurs ou du hash, 
+                        <p class="text-sm text-slate-500 mt-2">Une extraction 100 % naturelle obtenue par pression mécanique. En appliquant simultanément de la chaleur et une forte pression sur des fleurs ou du hash, 
                             on libère une résine pure, collante et ultra-concentrée, sans jamais utiliser de solvants chimiques.</p>
                     </div>
                 </div>
@@ -197,11 +177,11 @@
                 </div>
             </section>
 
-            <!-- 4. POTENCY (JUSTIFIÉ) -->
+            <!-- 4. POTENCY -->
             <section class="grid grid-cols-1 lg:grid-cols-3 gap-8">
                 <div class="lg:col-span-2 bg-white p-6 rounded-xl shadow-lg">
-                    <h2 class="section-title" data-editable="potency_title">4. Échelle de Puissance</h2>
-                    <p class="text-slate-600 mb-4 text-sm text-justify" data-editable="potency_desc">Comparatif des taux moyens de THC observés en laboratoire pour les différentes catégories de produits.</p>
+                    <h2 class="section-title" data-editable="potency_title">Échelle de Puissance</h2>
+                    <p class="text-slate-600 mb-4 text-sm text-justify" data-editable="potency_desc">Comparatif des taux moyens de THC observés en laboratoire.</p>
                     <div class="chart-container">
                         <canvas id="potencyChart"></canvas>
                     </div>
@@ -209,96 +189,65 @@
                 <div class="lg:col-span-1 bg-emerald-50 border-l-4 border-emerald-500 p-6 rounded-r-xl">
                     <h4 class="font-bold text-emerald-900 text-lg mb-2" data-editable="didyouknow_title">Le Mythe du THC</h4>
                     <p class="text-sm text-emerald-800 leading-relaxed text-justify" data-editable="didyouknow_text">
-                        Attention : un taux de THC élevé (80%+) ne garantit pas une expérience "meilleure". C'est l'<strong>Effet d'Entourage</strong> qui compte : la synergie complexe entre les cannabinoïdes (THC, CBD, CBG) et les terpènes (Limonène, Myrcène).
-                        <br><br>
-                        Imaginez le THC comme le moteur d'une voiture, et les terpènes comme le volant et les pneus qui déterminent la tenue de route et la direction du voyage.
+                        Ne vous fiez pas au seul pourcentage. Un taux de THC extrême (80%+) offre souvent un effet intense mais « plat ». La véritable qualité provient 
+                        de l'<strong>Effet d'Entourage</strong>, où les terpènes orientent le voyage.
+
+                        Par exemple, le <strong>Myrcène</strong> (dominant dans la OG Kush ou un Hash Afghan) ancre la relaxation physique, tandis que le <strong>Limonène</strong> (typique de la Super Lemon Haze) booste l'énergie et l'humeur. Le <strong>Caryophyllène</strong> 
+                        (Girl Scout Cookies) apporte, lui, un apaisement anti-stress. Cette synergie crée une expérience bien plus riche et nuancée que la puissance brute isolée.
                     </p>
                 </div>
             </section>
 
             <!-- 5. COMPARATOR -->
             <section class="bg-white p-8 rounded-2xl shadow-xl border border-slate-100">
-                <h2 class="section-title" data-editable="comp_title">5. Comparateur Interactif</h2>
-                <p class="text-slate-600 mb-6 text-justify" data-editable="comp_desc">Sélectionnez deux produits pour visualiser leurs différences de profil organoleptique et d'effet.</p>
+                <h2 class="section-title" data-editable="comp_title">Comparateur Interactif</h2>
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
                     <div class="space-y-6 flex flex-col justify-center bg-slate-50 p-6 rounded-xl">
                         <div>
-                            <label class="block text-sm font-bold text-slate-700 mb-2">Produit A (Zone Bleue)</label>
-                            <select id="selectA" class="w-full p-3 rounded border border-slate-300 bg-white outline-none focus:ring-2 focus:ring-blue-500" onchange="updateComparator()"></select>
+                            <label class="block text-sm font-bold text-slate-700 mb-2">Produit A</label>
+                            <select id="selectA" class="w-full p-3 rounded border border-slate-300 bg-white outline-none" onchange="updateComparator()"></select>
                         </div>
                         <div>
-                            <label class="block text-sm font-bold text-slate-700 mb-2">Produit B (Zone Rose)</label>
-                            <select id="selectB" class="w-full p-3 rounded border border-slate-300 bg-white outline-none focus:ring-2 focus:ring-pink-500" onchange="updateComparator()"></select>
+                            <label class="block text-sm font-bold text-slate-700 mb-2">Produit B</label>
+                            <select id="selectB" class="w-full p-3 rounded border border-slate-300 bg-white outline-none" onchange="updateComparator()"></select>
                         </div>
                     </div>
                     <div class="md:col-span-2">
-                        <div class="chart-container">
-                            <canvas id="comparatorRadar"></canvas>
-                        </div>
+                        <div class="chart-container"><canvas id="comparatorRadar"></canvas></div>
                     </div>
                 </div>
             </section>
 
-            <!-- 6. MATRIX (JUSTIFIÉ) -->
+            <!-- 6. MATRIX -->
             <section class="bg-white p-6 rounded-xl shadow-md">
-                <h2 class="section-title" data-editable="matrix_title">6. Matrice : Texture vs Pureté</h2>
-                <div class="mb-4 text-slate-600 text-justify" data-editable="matrix_desc">
-                    <p>Ce graphique unique positionne chaque produit selon deux axes critiques :</p>
-                    <ul class="list-disc pl-5 mt-2 text-sm">
-                        <li><strong>Axe X (Pureté) :</strong> La concentration en têtes de trichomes (cannabinoïdes + terpènes) par rapport à la matière végétale inerte.</li>
-                        <li><strong>Axe Y (Texture) :</strong> De l'état solide (fleur) à l'état liquide (huile), en passant par les textures "beurre" ou "sable".</li>
-                    </ul>
-                </div>
+                <h2 class="section-title" data-editable="matrix_title">Texture vs Pureté</h2>
+                <p class="text-slate-600 mb-4 text-justify" data-editable="matrix_desc">Analyse de la consistance (Solide/Liquide) par rapport à la concentration en trichomes.</p>
                 <div id="globalMatrixPlot" class="w-full h-[500px]"></div>
             </section>
 
-            <!-- 7. LEXICON (TEXTES JUSTIFIÉS) -->
+            <!-- 7. LEXICON -->
             <section class="bg-slate-900 text-slate-300 p-8 rounded-xl">
-                <h2 class="section-title !text-white" data-editable="lex_title">7. Lexique du Connaisseur</h2>
+                <h2 class="section-title !text-white" data-editable="lex_title">Lexique du Connaisseur</h2>
                 <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6 text-sm text-justify">
-                    <div>
-                        <strong class="block text-emerald-400 text-lg mb-1 text-left">Trichomes</strong>
-                        <span data-editable="lex_1">Les glandes résineuses microscopiques en forme de champignon qui recouvrent la fleur. C'est l'usine chimique de la plante.</span>
-                    </div>
-                    <div>
-                        <strong class="block text-emerald-400 text-lg mb-1 text-left">Terpènes</strong>
-                        <span data-editable="lex_2">Composés aromatiques volatils (Limonène, Pinène...). Ils définissent l'odeur et orientent l'effet (sédatif ou stimulant).</span>
-                    </div>
-                    <div>
-                        <strong class="block text-emerald-400 text-lg mb-1 text-left">Full Melt</strong>
-                        <span data-editable="lex_3">Un gage de pureté extrême pour un hash (souvent Water Hash) qui fond totalement à la chaleur sans laisser aucun résidu (6 étoiles).</span>
-                    </div>
-                    <div>
-                        <strong class="block text-emerald-400 text-lg mb-1 text-left">Solventless</strong>
-                        <span data-editable="lex_4">Méthodes d'extraction mécaniques utilisant uniquement l'eau, la glace, la chaleur et la pression. Aucune chimie.</span>
-                    </div>
-                    <div>
-                        <strong class="block text-emerald-400 text-lg mb-1 text-left">Fresh Frozen</strong>
-                        <span data-editable="lex_5">Plante congelée immédiatement après récolte (sans séchage) pour préserver les terpènes volatils "vivants" (Live Resin/Rosin).</span>
-                    </div>
-                    <div>
-                        <strong class="block text-emerald-400 text-lg mb-1 text-left">Curing</strong>
-                        <span data-editable="lex_6">Processus d'affinage lent en bocal hermétique. Crucial pour stabiliser l'humidité et développer la complexité aromatique.</span>
-                    </div>
-                    <div>
-                        <strong class="block text-emerald-400 text-lg mb-1 text-left">Pheno Hunting</strong>
-                        <span data-editable="lex_7">L'art de sélectionner la meilleure plante (le meilleur phénotype) parmi des centaines de graines d'une même variété.</span>
-                    </div>
-                    <div>
-                        <strong class="block text-emerald-400 text-lg mb-1 text-left">Wash</strong>
-                        <span data-editable="lex_8">Action de laver la matière végétale dans de l'eau glacée pour en détacher les trichomes (pour faire du Bubble Hash).</span>
-                    </div>
+                    <div><strong class="block text-emerald-400 mb-1">Trichomes</strong><span data-editable="lex_1">Les glandes résineuses microscopiques en forme de champignon qui recouvrent la fleur. C'est l'usine chimique de la plante.</span></div>
+                    <div><strong class="block text-emerald-400 mb-1">Terpènes</strong><span data-editable="lex_2">Composés aromatiques volatils (Limonène, Pinène...). Ils définissent l'odeur et orientent l'effet (sédatif ou stimulant).</span></div>
+                    <div><strong class="block text-emerald-400 mb-1">Full Melt</strong><span data-editable="lex_3">Un gage de pureté extrême pour un hash (souvent Water Hash) qui fond totalement à la chaleur sans laisser aucun résidu (6 étoiles).</span></div>
+                    <div><strong class="block text-emerald-400 mb-1">Solventless</strong><span data-editable="lex_4">Méthodes d'extraction mécaniques utilisant uniquement l'eau, la glace, la chaleur et la pression. Aucune chimie.</span></div>
+                    <div><strong class="block text-emerald-400 mb-1">Fresh Frozen</strong><span data-editable="lex_5">Plante congelée immédiatement après récolte (sans séchage) pour préserver les terpènes volatils "vivants" (Live Resin/Rosin).</span></div>
+                    <div><strong class="block text-emerald-400 mb-1">Curing</strong><span data-editable="lex_6">Processus d'affinage lent en bocal hermétique. Crucial pour stabiliser l'humidité et développer la complexité aromatique.</span></div>
+                    <div><strong class="block text-emerald-400 mb-1">Pheno Hunting</strong><span data-editable="lex_7">L'art de sélectionner la meilleure plante (le meilleur phénotype) parmi des centaines de graines d'une même variété.</span></div>
+                    <div><strong class="block text-emerald-400 mb-1">Wash</strong><span data-editable="lex_8">Action de laver la matière végétale dans de l'eau glacée pour en détacher les trichomes (pour faire du Bubble Hash).</span></div>
                 </div>
             </section>
 
-            <!-- DYNAMIC SECTIONS CONTAINER -->
+            <!-- DYNAMIC SECTIONS -->
             <div id="custom-sections-container" class="space-y-16"></div>
 
-            <!-- ADD SECTION BUTTON (Visible only in Edit Mode) -->
+            <!-- ADD SECTION BUTTON -->
             <div id="add-section-area" class="hidden text-center py-10 border-t-2 border-dashed border-slate-300 mt-12">
                 <p class="text-slate-400 mb-4 text-sm font-bold uppercase tracking-widest">Zone de Personnalisation</p>
-                <button onclick="openSectionModal()" class="bg-amber-500 hover:bg-amber-600 text-white px-8 py-4 rounded-full font-bold shadow-lg transition transform hover:scale-105 flex items-center gap-2 mx-auto">
-                    <span>➕</span> Ajouter une Nouvelle Section
+                <button onclick="openSectionModal()" class="bg-amber-500 hover:bg-amber-600 text-white px-8 py-4 rounded-full font-bold shadow-lg transition transform hover:scale-105 mx-auto">
+                    + Ajouter une Section
                 </button>
             </div>
         </div>
@@ -349,13 +298,12 @@
     </main>
 
 
-    <!-- MODAL FORM COLLECTION -->
+    <!-- MODAL: COLLECTION FORM -->
     <div id="collection-modal" class="hidden fixed inset-0 z-[100] bg-black/50 backdrop-blur-sm flex items-center justify-center p-4">
         <div class="bg-white w-full max-w-lg rounded-2xl shadow-2xl p-6 max-h-[90vh] overflow-y-auto">
             <h3 id="modal-title" class="text-2xl font-bold text-slate-800 mb-6">Ajouter à la collection</h3>
             <form id="collection-form" onsubmit="handleCollectionSubmit(event)" class="space-y-4">
                 <input type="hidden" name="editIndex" id="editIndex" value="-1">
-                
                 <div class="grid grid-cols-2 gap-4">
                     <div class="space-y-1">
                         <label class="text-xs font-bold text-slate-500 uppercase">Catégorie</label>
@@ -369,22 +317,18 @@
                         <input type="number" step="0.1" name="quantity" id="inp-quantity" class="input-field" placeholder="ex: 3.5">
                     </div>
                 </div>
-
                 <div id="hash-fields" class="hidden bg-amber-50 p-3 rounded-lg border border-amber-100 mb-2">
                     <label class="text-xs font-bold text-amber-600 uppercase mb-1">Type de Hash</label>
                     <input type="text" name="hashType" id="inp-hashType" class="input-field border-amber-200" placeholder="ex: Dry Sift...">
                 </div>
-
                 <div class="space-y-1">
                     <label class="text-xs font-bold text-slate-500 uppercase">Variété (Strain)</label>
                     <input type="text" name="strain" id="inp-strain" class="input-field font-bold" placeholder="ex: Gelato #41" required>
                 </div>
-                
                 <div class="space-y-1">
                     <label class="text-xs font-bold text-slate-500 uppercase">Nom Commercial</label>
                     <input type="text" name="commercialName" id="inp-commercialName" class="input-field" placeholder="ex: Blue Magic">
                 </div>
-
                 <div class="grid grid-cols-2 gap-4">
                     <div class="space-y-1">
                         <label class="text-xs font-bold text-slate-500 uppercase">Pays</label>
@@ -395,8 +339,6 @@
                         <input type="number" name="price" id="inp-price" class="input-field" placeholder="ex: 50">
                     </div>
                 </div>
-
-                <!-- Photos (Multiple) -->
                 <div class="space-y-1">
                     <label class="text-xs font-bold text-slate-500 uppercase">Photos (Max 3)</label>
                     <div class="flex gap-2 items-center">
@@ -407,7 +349,6 @@
                         <div id="photo-preview-list" class="flex gap-2"></div>
                     </div>
                 </div>
-
                 <div class="flex gap-3 pt-4">
                     <button type="button" onclick="closeCollectionForm()" class="flex-1 py-3 rounded-xl border border-slate-300 text-slate-500 font-bold">Annuler</button>
                     <button type="submit" class="flex-1 py-3 rounded-xl bg-emerald-600 text-white font-bold hover:bg-emerald-500">Sauvegarder</button>
@@ -416,14 +357,12 @@
         </div>
     </div>
 
-
-    <!-- MODAL NEW SECTION -->
+    <!-- MODAL: SECTION ADD -->
     <div id="section-modal" class="hidden fixed inset-0 z-[100] bg-black/50 backdrop-blur-sm flex items-center justify-center p-4">
         <div class="bg-white w-full max-w-lg rounded-2xl shadow-2xl p-6">
             <h3 class="text-2xl font-bold text-slate-800 mb-6" id="section-modal-title">Ajouter une Section</h3>
             <form id="section-form" onsubmit="handleSectionSubmit(event)" class="space-y-4">
-                <input type="hidden" name="secId" id="sec-id"> <!-- Hidden ID for editing -->
-                
+                <input type="hidden" name="secId" id="sec-id">
                 <div class="space-y-1">
                     <label class="text-xs font-bold text-slate-500 uppercase">Titre</label>
                     <input type="text" name="secTitle" id="sec-title" class="input-field font-bold" required>
@@ -433,11 +372,9 @@
                     <textarea name="secText" id="sec-text" class="input-field" required></textarea>
                 </div>
                 <div class="space-y-1">
-                    <label class="text-xs font-bold text-slate-500 uppercase">Image d'illustration (Optionnel)</label>
+                    <label class="text-xs font-bold text-slate-500 uppercase">Image (Optionnel)</label>
                     <input type="file" id="sec-photo-input" class="input-field" accept="image/*">
-                    <div id="sec-current-image" class="mt-2 hidden">
-                        <img src="" class="h-20 rounded border">
-                    </div>
+                    <div id="sec-current-image" class="mt-2 hidden"><img src="" class="h-20 rounded border"></div>
                 </div>
                 <div class="flex gap-3 pt-4">
                     <button type="button" onclick="closeSectionModal()" class="flex-1 py-3 rounded-xl border border-slate-300 text-slate-500 font-bold">Annuler</button>
@@ -447,37 +384,91 @@
         </div>
     </div>
 
+    <!-- MODAL: COLLECTION DETAIL (NEW) -->
+    <div id="collection-detail-modal" class="hidden fixed inset-0 z-[100] bg-black/80 backdrop-blur-sm flex items-center justify-center p-4 transition-opacity duration-300">
+        <div class="bg-white w-full max-w-lg rounded-2xl shadow-2xl overflow-hidden max-h-[90vh] flex flex-col animate-fade-in">
+            <!-- Header Image Area -->
+            <div id="cd-img-container" class="w-full h-64 bg-slate-900 relative flex-shrink-0 group">
+                <img id="cd-main-img" class="w-full h-full object-contain">
+                <div class="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent pointer-events-none"></div>
+                <button onclick="closeCollectionDetail()" class="absolute top-4 right-4 bg-white/20 text-white rounded-full p-2 hover:bg-white/40 backdrop-blur-sm transition">✕</button>
+                <div id="cd-thumbs" class="absolute bottom-4 left-0 right-0 flex justify-center gap-2 px-4 overflow-x-auto z-10"></div>
+            </div>
+            
+            <!-- Content -->
+            <div class="p-6 overflow-y-auto">
+                <div class="flex justify-between items-start mb-4">
+                    <div>
+                        <h2 id="cd-strain" class="text-3xl font-black text-slate-800 leading-tight">Strain</h2>
+                        <p id="cd-commercial" class="text-emerald-600 font-bold uppercase text-sm tracking-wider mt-1">Commercial</p>
+                    </div>
+                    <div class="text-5xl" id="cd-flag">🏳️</div>
+                </div>
+
+                <div class="grid grid-cols-2 gap-4 mb-6">
+                    <div class="bg-slate-50 p-3 rounded-xl border border-slate-100 text-center">
+                        <span class="text-[10px] uppercase text-slate-400 font-bold block">Quantité</span>
+                        <span id="cd-quantity" class="text-xl font-black text-slate-700">0g</span>
+                    </div>
+                    <div class="bg-slate-50 p-3 rounded-xl border border-slate-100 text-center">
+                        <span class="text-[10px] uppercase text-slate-400 font-bold block">Prix</span>
+                        <span id="cd-price" class="text-xl font-black text-slate-700">0€</span>
+                    </div>
+                    <div class="bg-slate-50 p-3 rounded-xl border border-slate-100 text-center">
+                        <span class="text-[10px] uppercase text-slate-400 font-bold block">Type</span>
+                        <span id="cd-category" class="text-lg font-bold text-slate-700">Weed</span>
+                    </div>
+                    <div class="bg-slate-50 p-3 rounded-xl border border-slate-100 text-center">
+                        <span class="text-[10px] uppercase text-slate-400 font-bold block">Date</span>
+                        <span id="cd-date" class="text-sm font-bold text-slate-700">...</span>
+                    </div>
+                </div>
+
+                <div class="space-y-3 text-sm text-slate-600 mb-8 bg-white rounded-xl">
+                    <div class="flex justify-between border-b border-slate-100 pb-2">
+                        <span>Producteur</span>
+                        <span id="cd-farm" class="font-bold text-slate-800">Unknown</span>
+                    </div>
+                    <div class="flex justify-between border-b border-slate-100 pb-2 hidden" id="cd-hash-row">
+                        <span>Technique Hash</span>
+                        <span id="cd-hash-type" class="font-bold text-amber-600">-</span>
+                    </div>
+                    <div class="flex justify-between border-b border-slate-100 pb-2">
+                        <span>Origine</span>
+                        <span id="cd-country" class="font-bold text-slate-800">-</span>
+                    </div>
+                </div>
+
+                <div class="flex gap-3">
+                    <button id="cd-btn-edit" class="flex-1 py-3 rounded-xl border border-blue-200 text-blue-600 font-bold hover:bg-blue-50 transition">Modifier</button>
+                    <button id="cd-btn-delete" class="flex-1 py-3 rounded-xl border border-red-200 text-red-500 font-bold hover:bg-red-50 transition">Supprimer</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
 
     <script>
-        // --- CORE DATA & STATE ---
-        const masterData = {
-            hash_dry: { name: "Dry Sift", color: "amber", hex: "#D97706", badge: "Tradition", icon: "🏜️", desc: "Tamisage mécanique ancestral.", process: [{t:"Séchage",d:"Plante affinée"},{t:"Tamisage",d:"Frottement"},{t:"Collection",d:"Poudre"},{t:"Presse",d:"Chaleur"}], radar: [30,90,70,50,60], metrics: [20,50,40,30], metricsLabels: ['Rendement','Puissance','Prix','Tech'], matrix: {x:45,y:9} },
-            hash_water: { name: "Ice-O-Lator", color: "blue", hex: "#2563EB", badge: "Pureté", icon: "❄️", desc: "Extraction eau glacée + Fresh Frozen.", process: [{t:"Congélation",d:"-40°C"},{t:"Lavage",d:"Eau+Glace"},{t:"Filtre",d:"Sacs"},{t:"Séchage",d:"Lyophilisation"}], radar: [90,30,60,95,85], metrics: [10,75,90,80], metricsLabels: ['Rendement','Puissance','Prix','Tech'], matrix: {x:70,y:6} },
-            hash_rosin: { name: "Rosin", color: "purple", hex: "#9333EA", badge: "Excellence", icon: "🔥", desc: "Pression et chaleur uniquement.", process: [{t:"Matériel",d:"Hash 6*"},{t:"Sac",d:"25u Nylon"},{t:"Presse",d:"Hydraulique"},{t:"Cure",d:"Cold Cure"}], radar: [85,50,80,90,95], metrics: [15,85,100,60], metricsLabels: ['Rendement','Puissance','Prix','Tech'], matrix: {x:85,y:3} },
-            weed_indica: { name: "Indica (Kush)", color: "indigo", hex: "#4F46E5", badge: "Relax", icon: "🏔️", desc: "Montagnes, effet lourd.", process: [{t:"Origine",d:"Hindu Kush"},{t:"Structure",d:"Buisson"},{t:"Flo",d:"8 sem"},{t:"Effet",d:"Physique"}], radar: [20,80,90,60,40], metrics: [80,22,50,90], metricsLabels: ['Rendement','THC','Taille','Facilité'], matrix: {x:20,y:10} },
-            weed_sativa: { name: "Sativa (Haze)", color: "yellow", hex: "#D97706", badge: "Energie", icon: "☀️", desc: "Tropiques, effet high.", process: [{t:"Origine",d:"Equateur"},{t:"Structure",d:"Géante"},{t:"Flo",d:"12+ sem"},{t:"Effet",d:"Cérébral"}], radar: [60,40,20,70,40], metrics: [90,18,100,60], metricsLabels: ['Rendement','THC','Taille','Facilité'], matrix: {x:18,y:10} },
-            weed_exotic: { name: "Exotics", color: "pink", hex: "#DB2777", badge: "Hybride", icon: "🧬", desc: "Breeding US moderne.", process: [{t:"Origine",d:"Indoor"},{t:"Structure",d:"Optimisée"},{t:"Flo",d:"9 sem"},{t:"Effet",d:"Mixte"}], radar: [80,50,60,80,50], metrics: [75,28,60,70], metricsLabels: ['Rendement','THC','Taille','Facilité'], matrix: {x:28,y:10} }
-        };
+        // --- DATA ---
+        const masterData = { hash_dry: { name: "Dry Sift", color: "amber", hex: "#D97706", badge: "Tradition", icon: "🏜️", desc: "Tamisage mécanique ancestral.", process: [{t:"Séchage",d:"Plante affinée"},{t:"Tamisage",d:"Frottement"},{t:"Collection",d:"Poudre"},{t:"Presse",d:"Chaleur"}], radar: [30,90,70,50,60], metrics: [20,50,40,30], metricsLabels: ['Rendement','Puissance','Prix','Tech'], matrix: {x:45,y:9} }, hash_water: { name: "Ice-O-Lator", color: "blue", hex: "#2563EB", badge: "Pureté", icon: "❄️", desc: "Extraction eau glacée + Fresh Frozen.", process: [{t:"Congélation",d:"-40°C"},{t:"Lavage",d:"Eau+Glace"},{t:"Filtre",d:"Sacs"},{t:"Séchage",d:"Lyophilisation"}], radar: [90,30,60,95,85], metrics: [10,75,90,80], metricsLabels: ['Rendement','Puissance','Prix','Tech'], matrix: {x:70,y:6} }, hash_rosin: { name: "Rosin", color: "purple", hex: "#9333EA", badge: "Excellence", icon: "🔥", desc: "Pression et chaleur uniquement.", process: [{t:"Matériel",d:"Hash 6*"},{t:"Sac",d:"25u Nylon"},{t:"Presse",d:"Hydraulique"},{t:"Cure",d:"Cold Cure"}], radar: [85,50,80,90,95], metrics: [15,85,100,60], metricsLabels: ['Rendement','Puissance','Prix','Tech'], matrix: {x:85,y:3} }, weed_indica: { name: "Indica (Kush)", color: "indigo", hex: "#4F46E5", badge: "Relax", icon: "🏔️", desc: "Montagnes, effet lourd.", process: [{t:"Origine",d:"Hindu Kush"},{t:"Structure",d:"Buisson"},{t:"Flo",d:"8 sem"},{t:"Effet",d:"Physique"}], radar: [20,80,90,60,40], metrics: [80,22,50,90], metricsLabels: ['Rendement','THC','Taille','Facilité'], matrix: {x:20,y:10} }, weed_sativa: { name: "Sativa (Haze)", color: "yellow", hex: "#D97706", badge: "Energie", icon: "☀️", desc: "Tropiques, effet high.", process: [{t:"Origine",d:"Equateur"},{t:"Structure",d:"Géante"},{t:"Flo",d:"12+ sem"},{t:"Effet",d:"Cérébral"}], radar: [60,40,20,70,40], metrics: [90,18,100,60], metricsLabels: ['Rendement','THC','Taille','Facilité'], matrix: {x:18,y:10} }, weed_exotic: { name: "Exotics", color: "pink", hex: "#DB2777", badge: "Hybride", icon: "🧬", desc: "Breeding US moderne.", process: [{t:"Origine",d:"Indoor"},{t:"Structure",d:"Optimisée"},{t:"Flo",d:"9 sem"},{t:"Effet",d:"Mixte"}], radar: [80,50,60,80,50], metrics: [75,28,60,70], metricsLabels: ['Rendement','THC','Taille','Facilité'], matrix: {x:28,y:10} } };
 
         let collection = JSON.parse(localStorage.getItem('green_codex_collection_v4') || '[]');
         let contentMap = JSON.parse(localStorage.getItem('green_codex_content_v4') || '{}');
         let customSections = JSON.parse(localStorage.getItem('green_codex_custom_sections_v4') || '[]');
-        
         let isEditMode = false;
         let currentPhotos = [];
         let currentSectionImage = null;
 
-        // --- NAVIGATION ---
+        // --- CORE FUNCTIONS ---
         function showView(viewId) {
             document.querySelectorAll('[id^="view-"]').forEach(el => el.classList.add('hidden'));
             document.getElementById(`view-${viewId}`).classList.remove('hidden');
             document.getElementById('navBackBtn').classList.toggle('hidden', viewId === 'home');
-            document.getElementById('editModeBtn').classList.toggle('hidden', viewId !== 'home'); 
+            document.getElementById('editModeBtn').classList.toggle('hidden', viewId !== 'home');
             window.scrollTo(0,0);
             if(viewId === 'collection') renderCollectionList();
         }
 
-        // --- COMPRESSION UTILITY ---
         function compressImage(file, maxWidth = 800, quality = 0.6) {
             return new Promise((resolve) => {
                 const reader = new FileReader();
@@ -498,37 +489,24 @@
             });
         }
 
-        // --- GLOBAL TEXT EDIT LOGIC ---
         function toggleEditMode() {
             isEditMode = !isEditMode;
             document.body.classList.toggle('edit-mode-active', isEditMode);
             document.getElementById('edit-banner').classList.toggle('hidden', !isEditMode);
             document.getElementById('editModeBtn').classList.toggle('bg-amber-500', isEditMode);
             document.getElementById('add-section-area').classList.toggle('hidden', !isEditMode);
-            
-            // Attach/Detach generic listeners
-            const elements = document.querySelectorAll('[data-editable]');
-            elements.forEach(el => {
-                if(isEditMode) {
-                    el.classList.add('editable-highlight');
-                    el.onclick = (e) => { e.preventDefault(); e.stopPropagation(); editContent(e.target.closest('[data-editable]')); };
-                } else {
-                    el.classList.remove('editable-highlight');
-                    el.onclick = null;
-                }
+            document.querySelectorAll('[data-editable]').forEach(el => {
+                if(isEditMode) { el.classList.add('editable-highlight'); el.onclick = (e) => { e.preventDefault(); e.stopPropagation(); editContent(e.target.closest('[data-editable]')); }; } 
+                else { el.classList.remove('editable-highlight'); el.onclick = null; }
             });
-            renderCustomSections(); // Re-render to show/hide edit buttons
+            renderCustomSections();
         }
 
         function editContent(el) {
             if(!isEditMode || !el) return;
             const key = el.getAttribute('data-editable');
-            // If it's a paragraph with HTML, we try to preserve basics, but prompt is simple text.
-            const currentText = el.innerText;
-            const newText = prompt("Modifier le texte :", currentText);
-            
-            if(newText !== null && newText !== currentText) {
-                // If it was a list or complex HTML, this simplifies it to text. OK for this use case.
+            const newText = prompt("Modifier le texte :", el.innerText);
+            if(newText !== null && newText !== el.innerText) {
                 el.innerText = newText;
                 contentMap[key] = newText;
                 localStorage.setItem('green_codex_content_v4', JSON.stringify(contentMap));
@@ -543,184 +521,80 @@
             renderCustomSections();
         }
 
-        // --- CUSTOM SECTIONS LOGIC (Updated for Edit) ---
-        
-        function openSectionModal(editId = null) {
-            const form = document.getElementById('section-form');
-            form.reset();
-            currentSectionImage = null;
-            document.getElementById('sec-current-image').classList.add('hidden');
+        // --- NEW DETAIL MODAL LOGIC ---
+        function openCollectionDetail(index) {
+            const item = collection[index];
+            document.getElementById('cd-strain').innerText = item.strain;
+            document.getElementById('cd-commercial').innerText = item.commercialName || item.farm || 'Sans nom';
+            document.getElementById('cd-flag').innerText = getFlag(item.country);
+            document.getElementById('cd-quantity').innerText = item.quantity + 'g';
+            document.getElementById('cd-price').innerText = (item.price || '0') + '€';
+            document.getElementById('cd-category').innerText = item.category === 'hash' ? 'Hash 🍫' : 'Weed 🥦';
+            document.getElementById('cd-date').innerText = new Date(item.date).toLocaleDateString();
+            document.getElementById('cd-farm').innerText = item.farm || '-';
+            document.getElementById('cd-country').innerText = item.country || '-';
             
-            if (editId) {
-                const section = customSections.find(s => s.id === editId);
-                if (section) {
-                    document.getElementById('section-modal-title').innerText = "Modifier la Section";
-                    document.getElementById('sec-id').value = section.id;
-                    document.getElementById('sec-title').value = section.title;
-                    document.getElementById('sec-text').value = section.text;
-                    if(section.image) {
-                        currentSectionImage = section.image;
-                        document.querySelector('#sec-current-image img').src = section.image;
-                        document.getElementById('sec-current-image').classList.remove('hidden');
-                    }
+            if(item.category === 'hash' && item.type) {
+                document.getElementById('cd-hash-row').classList.remove('hidden');
+                document.getElementById('cd-hash-type').innerText = item.type;
+            } else {
+                document.getElementById('cd-hash-row').classList.add('hidden');
+            }
+
+            // Buttons Logic
+            document.getElementById('cd-btn-edit').onclick = () => { closeCollectionDetail(); openCollectionForm(index); };
+            document.getElementById('cd-btn-delete').onclick = () => { if(confirm('Supprimer ?')) { collection.splice(index, 1); saveCollection(); closeCollectionDetail(); } };
+
+            // Photos Logic
+            const imgContainer = document.getElementById('cd-img-container');
+            const mainImg = document.getElementById('cd-main-img');
+            const thumbsContainer = document.getElementById('cd-thumbs');
+            thumbsContainer.innerHTML = '';
+
+            if (item.photos && item.photos.length > 0) {
+                mainImg.src = item.photos[0];
+                mainImg.classList.remove('opacity-30', 'p-10'); // Reset style
+                if (item.photos.length > 1) {
+                    item.photos.forEach(src => {
+                        const thumb = document.createElement('img');
+                        thumb.src = src;
+                        thumb.className = "w-12 h-12 rounded-lg border-2 border-white/50 hover:border-emerald-500 cursor-pointer object-cover shadow-md transition transform hover:scale-110";
+                        thumb.onclick = () => mainImg.src = src;
+                        thumbsContainer.appendChild(thumb);
+                    });
                 }
             } else {
-                document.getElementById('section-modal-title').innerText = "Ajouter une Section";
-                document.getElementById('sec-id').value = "";
+                mainImg.src = ""; // Clear
+                // Use emoji placeholder if no image
+                // For simplicity in this structure, we just show a placeholder image or empty state
+                // Since mainImg is an <img> tag, we can't easily put text inside.
+                // Workaround: set a placeholder data URI or hide image and show div.
+                // Keeping simple: if no photo, it shows empty.
             }
-            
-            document.getElementById('section-modal').classList.remove('hidden');
+            document.getElementById('collection-detail-modal').classList.remove('hidden');
         }
 
-        function closeSectionModal() {
-            document.getElementById('section-modal').classList.add('hidden');
-        }
+        function closeCollectionDetail() { document.getElementById('collection-detail-modal').classList.add('hidden'); }
 
-        async function handleSectionSubmit(e) {
-            e.preventDefault();
-            const form = e.target;
-            const id = form.secId.value ? parseInt(form.secId.value) : Date.now();
-            const title = form.secTitle.value;
-            const text = form.secText.value;
-            const fileInput = document.getElementById('sec-photo-input');
-            
-            // Check image
-            if (fileInput.files.length > 0) {
-                try {
-                    currentSectionImage = await compressImage(fileInput.files[0]);
-                } catch(err) {
-                    alert("Erreur image");
-                    return;
-                }
-            }
-
-            const newSection = { id, title, text, image: currentSectionImage };
-
-            // Update or Add
-            const existingIdx = customSections.findIndex(s => s.id === id);
-            if (existingIdx > -1) {
-                customSections[existingIdx] = newSection;
-            } else {
-                customSections.push(newSection);
-            }
-            
-            try {
-                localStorage.setItem('green_codex_custom_sections_v4', JSON.stringify(customSections));
-                renderCustomSections();
-                closeSectionModal();
-            } catch (err) {
-                alert("Espace de stockage plein !");
-            }
-        }
-
-        function deleteCustomSection(id) {
-            if(!confirm("Supprimer cette section ?")) return;
-            customSections = customSections.filter(s => s.id !== id);
-            localStorage.setItem('green_codex_custom_sections_v4', JSON.stringify(customSections));
-            renderCustomSections();
-        }
-
-        function renderCustomSections() {
-            const container = document.getElementById('custom-sections-container');
-            container.innerHTML = '';
-            customSections.forEach((sec, index) => {
-                // Strict adherence to visual charter AND Justified text
-                const html = `
-                    <section class="bg-white rounded-2xl shadow-md p-8 border-l-8 border-emerald-600 relative group animate-fade-in">
-                        ${isEditMode ? `
-                            <div class="absolute top-4 right-4 flex gap-2">
-                                <button onclick="openSectionModal(${sec.id})" class="text-blue-500 font-bold border border-blue-200 px-3 py-1 rounded hover:bg-blue-50 text-xs transition">Modifier</button>
-                                <button onclick="deleteCustomSection(${sec.id})" class="text-red-500 font-bold border border-red-200 px-3 py-1 rounded hover:bg-red-50 text-xs transition">Supprimer</button>
-                            </div>
-                        ` : ''}
-                        <h2 class="section-title">${index + 8}. ${sec.title}</h2>
-                        ${sec.image ? `<img src="${sec.image}" class="w-full max-h-96 object-cover rounded-xl mb-6 shadow-sm">` : ''}
-                        <div class="text-lg leading-relaxed text-slate-600 whitespace-pre-wrap text-justify">${sec.text}</div>
-                    </section>
-                `;
-                container.insertAdjacentHTML('beforeend', html);
-            });
-        }
-
-        // --- CHARTS (UNCHANGED) ---
-        const initCharts = () => {
-            new Chart(document.getElementById('potencyChart'), { type: 'bar', data: { labels: ['Sativa', 'Indica', 'Exotic', 'Dry Sift', 'Ice-O-Lator', 'Rosin', 'BHO'], datasets: [{ label: '% THC', data: [15,20,28,40,65,75,90], backgroundColor: ['#10B981','#10B981','#10B981','#D97706','#2563EB','#9333EA','#64748B'], borderRadius: 4 }] }, options: { indexAxis: 'y', responsive: true, maintainAspectRatio: false, plugins: {legend:false} } });
-            const sA = document.getElementById('selectA'), sB = document.getElementById('selectB');
-            Object.keys(masterData).forEach(k => { sA.add(new Option(masterData[k].name, k)); sB.add(new Option(masterData[k].name, k)); });
-            sA.value = "weed_sativa"; sB.value = "hash_rosin";
-            updateComparator();
-            const trace = { x: Object.values(masterData).map(d => d.matrix.x), y: Object.values(masterData).map(d => d.matrix.y), text: Object.values(masterData).map(d => d.name), mode: 'markers+text', type: 'scatter', textposition: 'top center', marker: { size: 30, color: Object.values(masterData).map(d => d.hex) } };
-            Plotly.newPlot('globalMatrixPlot', [trace], { xaxis: {title:'Pureté', range:[0,100]}, yaxis: {title:'Solidité', range:[0,12]}, margin:{t:20,l:40}, paper_bgcolor:'rgba(0,0,0,0)', plot_bgcolor:'rgba(0,0,0,0)' }, {displayModeBar:false});
-        };
+        // --- CHARTS ---
+        const initCharts = () => { new Chart(document.getElementById('potencyChart'), { type: 'bar', data: { labels: ['Sativa', 'Indica', 'Exotic', 'Dry Sift', 'Ice-O-Lator', 'Rosin', 'BHO'], datasets: [{ label: '% THC', data: [15,20,28,40,65,75,90], backgroundColor: ['#10B981','#10B981','#10B981','#D97706','#2563EB','#9333EA','#64748B'], borderRadius: 4 }] }, options: { indexAxis: 'y', responsive: true, maintainAspectRatio: false, plugins: {legend:false} } }); updateComparator(); const trace = { x: Object.values(masterData).map(d => d.matrix.x), y: Object.values(masterData).map(d => d.matrix.y), text: Object.values(masterData).map(d => d.name), mode: 'markers+text', type: 'scatter', textposition: 'top center', marker: { size: 30, color: Object.values(masterData).map(d => d.hex) } }; Plotly.newPlot('globalMatrixPlot', [trace], { xaxis: {title:'Pureté', range:[0,100]}, yaxis: {title:'Solidité', range:[0,12]}, margin:{t:20,l:40}, paper_bgcolor:'rgba(0,0,0,0)', plot_bgcolor:'rgba(0,0,0,0)' }, {displayModeBar:false}); };
         let comparatorChart;
-        function updateComparator() {
-            const dA = masterData[document.getElementById('selectA').value], dB = masterData[document.getElementById('selectB').value];
-            if(comparatorChart) comparatorChart.destroy();
-            comparatorChart = new Chart(document.getElementById('comparatorRadar'), { type: 'radar', data: { labels: ['Fruité', 'Terreux', 'Physique', 'Odeur', 'Intensité'], datasets: [ { label: dA.name, data: dA.radar, borderColor: '#3B82F6', backgroundColor: 'rgba(59,130,246,0.2)' }, { label: dB.name, data: dB.radar, borderColor: '#EC4899', backgroundColor: 'rgba(236,72,153,0.2)' } ] }, options: { responsive: true, maintainAspectRatio: false, scales: { r: { suggestedMin:0, suggestedMax:100 } } } });
-        }
-        function showDetail(key) {
-            const d = masterData[key];
-            showView('detail');
-            document.getElementById('detail-header').className = `bg-white p-8 rounded-2xl shadow-lg border-t-8 border-${d.color}-500`;
-            document.getElementById('detail-badge').innerText = d.badge;
-            document.getElementById('detail-badge').className = `px-3 py-1 rounded-full text-sm font-bold uppercase mb-2 inline-block bg-${d.color}-100 text-${d.color}-800`;
-            document.getElementById('detail-title').innerText = d.name;
-            document.getElementById('detail-title').className = `text-4xl md:text-5xl font-black text-${d.color}-900`;
-            document.getElementById('detail-icon').innerText = d.icon;
-            document.getElementById('detail-desc').innerText = d.desc;
-            document.getElementById('detail-desc').className = `text-lg text-slate-600 border-l-4 border-${d.color}-200 pl-4 text-justify`;
-            document.getElementById('detail-flow').innerHTML = d.process.map(s => `<div class="bg-slate-700 p-4 rounded-lg border border-slate-600"><div class="text-xs text-${d.color}-400 font-mono uppercase">${s.t}</div><div class="font-bold">${s.d}</div></div>`).join('');
-            const cvs1 = document.getElementById('detailRadarChart'); const cvs2 = document.getElementById('detailBarChart');
-            if(cvs1.chart) cvs1.chart.destroy(); if(cvs2.chart) cvs2.chart.destroy();
-            cvs1.chart = new Chart(cvs1, { type: 'radar', data: { labels: ['Fruité','Terreux','Physique','Odeur','Intensité'], datasets: [{ label: d.name, data: d.radar, backgroundColor: `${d.hex}33`, borderColor: d.hex, fill: true }] }, options: { maintainAspectRatio: false, plugins: {legend:false} } });
-            cvs2.chart = new Chart(cvs2, { type: 'bar', data: { labels: ['Rendement','Puissance','Prix','Tech'], datasets: [{ data: d.metrics, backgroundColor: d.hex, borderRadius: 6 }] }, options: { maintainAspectRatio: false, plugins: {legend:false}, scales: {y:{max:100}} } });
-        }
+        function updateComparator() { const dA = masterData[document.getElementById('selectA').value || "weed_sativa"], dB = masterData[document.getElementById('selectB').value || "hash_rosin"]; if(comparatorChart) comparatorChart.destroy(); comparatorChart = new Chart(document.getElementById('comparatorRadar'), { type: 'radar', data: { labels: ['Fruité', 'Terreux', 'Physique', 'Odeur', 'Intensité'], datasets: [ { label: dA.name, data: dA.radar, borderColor: '#3B82F6', backgroundColor: 'rgba(59,130,246,0.2)' }, { label: dB.name, data: dB.radar, borderColor: '#EC4899', backgroundColor: 'rgba(236,72,153,0.2)' } ] }, options: { responsive: true, maintainAspectRatio: false, scales: { r: { suggestedMin:0, suggestedMax:100 } } } }); }
+        function showDetail(key) { const d = masterData[key]; showView('detail'); document.getElementById('detail-header').className = `bg-white p-8 rounded-2xl shadow-lg border-t-8 border-${d.color}-500`; document.getElementById('detail-badge').innerText = d.badge; document.getElementById('detail-badge').className = `px-3 py-1 rounded-full text-sm font-bold uppercase mb-2 inline-block bg-${d.color}-100 text-${d.color}-800`; document.getElementById('detail-title').innerText = d.name; document.getElementById('detail-title').className = `text-4xl md:text-5xl font-black text-${d.color}-900`; document.getElementById('detail-icon').innerText = d.icon; document.getElementById('detail-desc').innerText = d.desc; document.getElementById('detail-desc').className = `text-lg text-slate-600 border-l-4 border-${d.color}-200 pl-4 text-justify`; document.getElementById('detail-flow').innerHTML = d.process.map(s => `<div class="bg-slate-700 p-4 rounded-lg border border-slate-600"><div class="text-xs text-${d.color}-400 font-mono uppercase">${s.t}</div><div class="font-bold">${s.d}</div></div>`).join(''); const cvs1 = document.getElementById('detailRadarChart'); const cvs2 = document.getElementById('detailBarChart'); if(cvs1.chart) cvs1.chart.destroy(); if(cvs2.chart) cvs2.chart.destroy(); cvs1.chart = new Chart(cvs1, { type: 'radar', data: { labels: ['Fruité','Terreux','Physique','Odeur','Intensité'], datasets: [{ label: d.name, data: d.radar, backgroundColor: `${d.hex}33`, borderColor: d.hex, fill: true }] }, options: { maintainAspectRatio: false, plugins: {legend:false} } }); cvs2.chart = new Chart(cvs2, { type: 'bar', data: { labels: ['Rendement','Puissance','Prix','Tech'], datasets: [{ data: d.metrics, backgroundColor: d.hex, borderRadius: 6 }] }, options: { maintainAspectRatio: false, plugins: {legend:false}, scales: {y:{max:100}} } }); }
 
-        // --- COLLECTION MANAGER ---
-
-        function saveCollection() {
-            try {
-                localStorage.setItem('green_codex_collection_v4', JSON.stringify(collection));
-                updateDashboardStats();
-                renderCollectionList();
-            } catch (e) {
-                alert("Espace de stockage plein ! Réduisez les photos.");
-            }
-        }
-
-        function updateDashboardStats() {
-            document.getElementById('stats-total').innerText = collection.length;
-            document.getElementById('stats-weed').innerText = collection.filter(i => i.category === 'weed').length;
-            document.getElementById('stats-hash').innerText = collection.filter(i => i.category === 'hash').length;
-            const totalMass = collection.reduce((acc, curr) => acc + (parseFloat(curr.quantity) || 0), 0);
-            document.getElementById('stats-mass').innerText = totalMass.toFixed(1) + 'g';
-        }
-
-        function getFlag(c) { 
-            if(!c) return '🏳️'; 
-            const m = {
-                'france':'🇫🇷','espagne':'🇪🇸','spain':'🇪🇸','usa':'🇺🇸','cali':'🇺🇸','maroc':'🇲🇦','morocco':'🇲🇦',
-                'suisse':'🇨🇭','italie':'🇮🇹','canada':'🇨🇦','uk':'🇬🇧','angleterre':'🇬🇧','allemagne':'🇩🇪',
-                'thailande':'🇹🇭','pays-bas':'🇳🇱','hollande':'🇳🇱','netherlands':'🇳🇱','belgique':'🇧🇪'
-            };
-            // Recherche partielle
-            const lower = c.toLowerCase();
-            for(let k in m) if(lower.includes(k)) return m[k];
-            return '🏳️';
-        }
+        // --- COLLECTION ---
+        function saveCollection() { try { localStorage.setItem('green_codex_collection_v4', JSON.stringify(collection)); updateDashboardStats(); renderCollectionList(); } catch (e) { alert("Stockage plein."); } }
+        function updateDashboardStats() { document.getElementById('stats-total').innerText = collection.length; document.getElementById('stats-weed').innerText = collection.filter(i => i.category === 'weed').length; document.getElementById('stats-hash').innerText = collection.filter(i => i.category === 'hash').length; document.getElementById('stats-mass').innerText = collection.reduce((acc, curr) => acc + (parseFloat(curr.quantity) || 0), 0).toFixed(1) + 'g'; }
+        function getFlag(c) { if(!c) return '🏳️'; const m = {'france':'🇫🇷','espagne':'🇪🇸','spain':'🇪🇸','usa':'🇺🇸','cali':'🇺🇸','maroc':'🇲🇦','morocco':'🇲🇦','suisse':'🇨🇭','italie':'🇮🇹','canada':'🇨🇦','uk':'🇬🇧','angleterre':'🇬🇧','allemagne':'🇩🇪','thailande':'🇹🇭','pays-bas':'🇳🇱','hollande':'🇳🇱','netherlands':'🇳🇱','belgique':'🇧🇪'}; for(let k in m) if(c.toLowerCase().includes(k)) return m[k]; return '🏳️'; }
 
         function renderCollectionList() {
             const container = document.getElementById('collection-list');
             container.innerHTML = '';
             document.getElementById('empty-state').classList.toggle('hidden', collection.length > 0);
-            
             collection.forEach((item, index) => {
-                const photosHtml = item.photos && item.photos.length ? 
-                    `<img src="${item.photos[0]}" class="w-full h-full object-cover">` : 
-                    `<div class="w-full h-full flex items-center justify-center text-3xl opacity-30">${item.category==='hash'?'🍫':'🥦'}</div>`;
-                
+                const photosHtml = item.photos && item.photos.length ? `<img src="${item.photos[0]}" class="w-full h-full object-cover">` : `<div class="w-full h-full flex items-center justify-center text-3xl opacity-30">${item.category==='hash'?'🍫':'🥦'}</div>`;
                 const html = `
-                <div class="bg-white rounded-xl shadow-sm border border-slate-100 p-4 flex gap-4 relative group hover:border-emerald-300 transition">
+                <div onclick="openCollectionDetail(${index})" class="bg-white rounded-xl shadow-sm border border-slate-100 p-4 flex gap-4 relative group hover:border-emerald-300 transition cursor-pointer">
                     <div class="w-20 h-20 rounded-lg bg-slate-100 flex-shrink-0 overflow-hidden relative">
                         ${photosHtml}
                         ${item.photos && item.photos.length > 1 ? `<span class="absolute bottom-0 right-0 bg-black/50 text-white text-[10px] px-1">+${item.photos.length-1}</span>` : ''}
@@ -734,10 +608,9 @@
                         ${item.type ? `<span class="bg-amber-100 text-amber-800 text-[10px] px-1.5 py-0.5 rounded border border-amber-200 block w-fit mb-1">${item.type}</span>` : ''}
                         <div class="flex items-center gap-2 mt-2">
                              <span class="bg-emerald-50 text-emerald-700 text-xs px-2 py-1 rounded font-bold">${item.quantity}g</span>
-                             
                              <div class="ml-auto flex gap-1">
-                                <button onclick="openCollectionForm(${index})" class="text-blue-400 hover:text-blue-600 p-1"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg></button>
-                                <button onclick="deleteItem(${index})" class="text-red-400 hover:text-red-600 p-1"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg></button>
+                                <button onclick="event.stopPropagation(); openCollectionForm(${index})" class="text-blue-400 hover:text-blue-600 p-1"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg></button>
+                                <button onclick="event.stopPropagation(); deleteItem(${index})" class="text-red-400 hover:text-red-600 p-1"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg></button>
                              </div>
                         </div>
                     </div>
@@ -746,15 +619,12 @@
             });
         }
 
-        // --- FORM HANDLING ---
-
+        // --- FORMS ---
         function openCollectionForm(editIndex = -1) {
-            const form = document.getElementById('collection-form');
-            form.reset();
+            const form = document.getElementById('collection-form'); form.reset();
             document.getElementById('editIndex').value = editIndex;
             document.getElementById('modal-title').innerText = editIndex === -1 ? "Ajouter" : "Modifier";
             currentPhotos = [];
-            
             if(editIndex > -1) {
                 const item = collection[editIndex];
                 document.getElementById('inp-category').value = item.category;
@@ -762,91 +632,42 @@
                 document.getElementById('inp-strain').value = item.strain;
                 document.getElementById('inp-commercialName').value = item.commercialName;
                 document.getElementById('inp-country').value = item.country;
-                if(item.farm) document.getElementById('inp-farm').value = item.farm; 
+                if(item.farm) document.getElementById('inp-farm').value = item.farm; // FIXED
                 document.getElementById('inp-price').value = item.price;
                 if(item.type) document.getElementById('inp-hashType').value = item.type;
                 toggleFormFields(item.category);
                 if(item.photos) currentPhotos = [...item.photos];
-            } else {
-                toggleFormFields('weed');
-            }
-            
+            } else { toggleFormFields('weed'); }
             renderPhotoPreviews();
             document.getElementById('collection-modal').classList.remove('hidden');
         }
-
-        function closeCollectionForm() {
-            document.getElementById('collection-modal').classList.add('hidden');
-        }
-
-        function toggleFormFields(category) {
-            document.getElementById('hash-fields').classList.toggle('hidden', category !== 'hash');
-        }
-
-        async function handlePhotos(input) {
-            if (input.files) {
-                const remainingSlots = 3 - currentPhotos.length;
-                if(remainingSlots <= 0) { alert("Max 3 photos !"); return; }
-                const files = Array.from(input.files).slice(0, remainingSlots);
-                for (const file of files) {
-                    try { const compressed = await compressImage(file); currentPhotos.push(compressed); } catch(e) {}
-                }
-                renderPhotoPreviews();
-            }
-        }
-
-        function removePhoto(idx) {
-            currentPhotos.splice(idx, 1);
-            renderPhotoPreviews();
-        }
-
-        function renderPhotoPreviews() {
-            const container = document.getElementById('photo-preview-list');
-            container.innerHTML = currentPhotos.map((src, i) => `
-                <div class="w-20 h-20 rounded-xl relative overflow-hidden group">
-                    <img src="${src}" class="w-full h-full object-cover">
-                    <button type="button" onclick="removePhoto(${i})" class="absolute top-0 right-0 bg-red-500 text-white text-xs p-1 opacity-0 group-hover:opacity-100">X</button>
-                </div>
-            `).join('');
-        }
-
+        function closeCollectionForm() { document.getElementById('collection-modal').classList.add('hidden'); }
+        function toggleFormFields(cat) { document.getElementById('hash-fields').classList.toggle('hidden', cat !== 'hash'); }
+        async function handlePhotos(input) { if (input.files) { const rem = 3 - currentPhotos.length; if(rem <= 0) { alert("Max 3 photos !"); return; } const files = Array.from(input.files).slice(0, rem); for (const file of files) { try { const compressed = await compressImage(file); currentPhotos.push(compressed); } catch(e) {} } renderPhotoPreviews(); } }
+        function removePhoto(idx) { currentPhotos.splice(idx, 1); renderPhotoPreviews(); }
+        function renderPhotoPreviews() { document.getElementById('photo-preview-list').innerHTML = currentPhotos.map((src, i) => `<div class="w-20 h-20 rounded-xl relative overflow-hidden group"><img src="${src}" class="w-full h-full object-cover"><button type="button" onclick="removePhoto(${i})" class="absolute top-0 right-0 bg-red-500 text-white text-xs p-1 opacity-0 group-hover:opacity-100">X</button></div>`).join(''); }
         function handleCollectionSubmit(e) {
-            e.preventDefault();
-            const formData = new FormData(e.target);
-            const idx = parseInt(document.getElementById('editIndex').value);
-            
-            const newItem = {
-                category: formData.get('category'),
-                quantity: formData.get('quantity'),
-                strain: formData.get('strain'),
-                commercialName: formData.get('commercialName'),
-                type: formData.get('hashType'),
-                country: formData.get('country'),
-                price: formData.get('price'),
-                photos: currentPhotos, // Array
-                date: new Date().toISOString()
-            };
-            
-            if(idx > -1) collection[idx] = newItem; // Edit
-            else collection.unshift(newItem); // Add
-            
-            saveCollection();
-            closeCollectionForm();
+            e.preventDefault(); const f = new FormData(e.target); const idx = parseInt(document.getElementById('editIndex').value);
+            const item = { category: f.get('category'), quantity: f.get('quantity'), strain: f.get('strain'), commercialName: f.get('commercialName'), type: f.get('hashType'), country: f.get('country'), price: f.get('price'), photos: currentPhotos, date: new Date().toISOString() };
+            if(idx > -1) collection[idx] = item; else collection.unshift(item);
+            saveCollection(); closeCollectionForm();
         }
+        function deleteItem(index) { if(confirm('Supprimer ?')) { collection.splice(index, 1); saveCollection(); } }
 
-        function deleteItem(index) {
-            if(confirm('Supprimer ?')) {
-                collection.splice(index, 1);
-                saveCollection();
-            }
-        }
+        // --- SECTIONS ---
+        function openSectionModal(id=null) { document.getElementById('section-form').reset(); document.getElementById('sec-current-image').classList.add('hidden'); currentSectionImage=null; if(id) { const s=customSections.find(x=>x.id===id); document.getElementById('sec-id').value=s.id; document.getElementById('sec-title').value=s.title; document.getElementById('sec-text').value=s.text; if(s.image){ currentSectionImage=s.image; document.querySelector('#sec-current-image img').src=s.image; document.getElementById('sec-current-image').classList.remove('hidden'); } } document.getElementById('section-modal').classList.remove('hidden'); }
+        function closeSectionModal() { document.getElementById('section-modal').classList.add('hidden'); }
+        async function handleSectionSubmit(e) { e.preventDefault(); const f=e.target; const id=f.secId.value?parseInt(f.secId.value):Date.now(); const file=document.getElementById('sec-photo-input').files[0]; if(file) currentSectionImage=await compressImage(file); const s={id, title:f.secTitle.value, text:f.secText.value, image:currentSectionImage}; const i=customSections.findIndex(x=>x.id===id); if(i>-1) customSections[i]=s; else customSections.push(s); localStorage.setItem('green_codex_custom_sections_v4',JSON.stringify(customSections)); renderCustomSections(); closeSectionModal(); }
+        function deleteCustomSection(id) { if(confirm('Supprimer ?')) { customSections=customSections.filter(x=>x.id!==id); localStorage.setItem('green_codex_custom_sections_v4',JSON.stringify(customSections)); renderCustomSections(); } }
+        function renderCustomSections() { document.getElementById('custom-sections-container').innerHTML = customSections.map((s,i) => `<section class="bg-white rounded-2xl shadow-md p-8 border-l-8 border-emerald-600 relative group animate-fade-in text-justify">${isEditMode?`<div class="absolute top-4 right-4 flex gap-2"><button onclick="openSectionModal(${s.id})" class="text-blue-500 font-bold border border-blue-200 px-3 py-1 rounded hover:bg-blue-50 text-xs">Modifier</button><button onclick="deleteCustomSection(${s.id})" class="text-red-500 font-bold border border-red-200 px-3 py-1 rounded hover:bg-red-50 text-xs">Supprimer</button></div>`:''}<h2 class="section-title">${i+8}. ${s.title}</h2>${s.image?`<img src="${s.image}" class="w-full max-h-96 object-cover rounded-xl mb-6 shadow-sm">`:''}<div class="text-lg leading-relaxed text-slate-600 whitespace-pre-wrap">${s.text}</div></section>`).join(''); }
 
-        window.addEventListener('load', () => {
-            initCharts();
-            loadSavedContent();
-            updateDashboardStats();
+        // INIT
+        window.addEventListener('load', () => { initCharts(); loadSavedContent(); updateDashboardStats(); 
+            // Populate selects
+            const sA = document.getElementById('selectA'), sB = document.getElementById('selectB');
+            Object.keys(masterData).forEach(k => { sA.add(new Option(masterData[k].name, k)); sB.add(new Option(masterData[k].name, k)); });
+            sA.value = "weed_sativa"; sB.value = "hash_rosin"; updateComparator();
         });
-
     </script>
 </body>
 </html>
