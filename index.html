@@ -77,7 +77,7 @@
         
         #updateAlert { display: none; flex-direction: row; align-items: center; }
         .update-text {
-            color: #166534; font-weight: bold; font-size: 14px; margin-right: 5px;
+            color: #166534; font-weight: bold; font-size: 20px; margin-right: 5px;
             background: rgba(255,255,255,0.95); padding: 6px 10px; border-radius: 6px;
             box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }
@@ -1011,28 +1011,6 @@
             if (isPostUpdate) {
                 handlePostUpdate();
             }
-        });
-    </script>
-</body>
-</html> const s=customSections.find(x=>x.id===id); document.getElementById('sec-id').value=s.id; document.getElementById('sec-title').value=s.title; document.getElementById('sec-text').value=s.text; if(s.image){ currentSectionImage=s.image; document.querySelector('#sec-current-image img').src=s.image; document.getElementById('sec-current-image').classList.remove('hidden'); } } document.getElementById('section-modal').classList.remove('hidden'); }
-        function closeSectionModal() { document.getElementById('section-modal').classList.add('hidden'); }
-        async function handleSectionSubmit(e) { e.preventDefault(); const f=e.target; const id=f.secId.value?parseInt(f.secId.value):Date.now(); const file=document.getElementById('sec-photo-input').files[0]; if(file) currentSectionImage=await compressImage(file); const s={id, title:f.secTitle.value, text:f.secText.value, image:currentSectionImage}; const i=customSections.findIndex(x=>x.id===id); if(i>-1) customSections[i]=s; else customSections.push(s); localStorage.setItem('green_codex_custom_sections_v4',JSON.stringify(customSections)); renderCustomSections(); closeSectionModal(); }
-        function deleteCustomSection(id) { if(confirm('Supprimer ?')) { customSections=customSections.filter(x=>x.id!==id); localStorage.setItem('green_codex_custom_sections_v4',JSON.stringify(customSections)); renderCustomSections(); } }
-        function renderCustomSections() { document.getElementById('custom-sections-container').innerHTML = customSections.map((s,i) => `<section class="bg-white rounded-2xl shadow-md p-8 border-l-8 border-emerald-600 relative group animate-fade-in text-justify">${isEditMode?`<div class="absolute top-4 right-4 flex gap-2"><button onclick="openSectionModal(${s.id})" class="text-blue-500 font-bold border border-blue-200 px-3 py-1 rounded hover:bg-blue-50 text-xs">Modifier</button><button onclick="deleteCustomSection(${s.id})" class="text-red-500 font-bold border border-red-200 px-3 py-1 rounded hover:bg-red-50 text-xs">Supprimer</button></div>`:''}<h2 class="section-title">${i+8}. ${s.title}</h2>${s.image?`<img src="${s.image}" class="w-full max-h-96 object-cover rounded-xl mb-6 shadow-sm">`:''}<div class="text-lg leading-relaxed text-slate-600 whitespace-pre-wrap">${s.text}</div></section>`).join(''); }
-
-        // INIT
-        window.addEventListener('load', () => { 
-            initCharts(); 
-            loadSavedContent(); 
-            updateDashboardStats(); 
-            
-            // Populate Selects
-            const sA = document.getElementById('selectA'), sB = document.getElementById('selectB');
-            Object.keys(masterData).forEach(k => { sA.add(new Option(masterData[k].name, k)); sB.add(new Option(masterData[k].name, k)); });
-            sA.value = "weed_sativa"; sB.value = "hash_rosin"; updateComparator();
-
-            // Start Update System
-            initUpdateSystem();
         });
     </script>
 </body>
