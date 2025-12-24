@@ -608,7 +608,7 @@
         const GITHUB_REPO     = 'Appli-Portfolio';        
         
         // Délai avant vérification (1 minute pour le test, peut être augmenté)
-        const CHECK_DELAY     = 1 * 60 * 1000; 
+        const CHECK_DELAY     = 0.1 * 60 * 1000; 
         
         // Clé de stockage pour le hash de version
         const UPDATE_STORAGE_KEY = 'green_codex_last_hash';
@@ -654,10 +654,10 @@
         // ============================================================
 
         function startUpdateCheckTimer() {
-            // Vérification unique après 30 secondes à l'ouverture
+            // Vérification unique après 5 secondes à l'ouverture
             setTimeout(() => {
                 checkGitHubStatus();
-            }, 30000);
+            }, 5000);
         }
 
         async function checkGitHubStatus() {
