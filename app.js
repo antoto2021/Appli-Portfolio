@@ -32,6 +32,7 @@
         let activeUpdates = [{ icon: "🚀", title: "Mise à jour", desc: "Nouvelle version disponible." }];
         let currentSlide = 0;
         let comparatorChart = null; // Important pour détruire le chart existant
+		let currentViewingFriendId = null; // AJOUT POUR LA SUPPRESSION
 
 		// --- UTILITAIRE : Récupérer le nom d'un ami via son ID ---
 		function getFriendName(uid) {
@@ -791,6 +792,7 @@
 
         async function viewFriendPortfolio(friend) {
             if (!firebaseInstance || !window.firebaseFuncs) { alert("Connexion Cloud nécessaire."); return; }
+			currentViewingFriendId = friend.id;
             showView('friend');
             document.getElementById('friend-view-name').innerText = friend.name;
             document.getElementById('friend-collection-list').innerHTML = '<div class="col-span-full text-center py-10"><div class="wn-loader"></div></div>';
@@ -804,6 +806,32 @@
                 renderFriendCollection(items);
             } catch (e) { alert("Impossible de charger."); showView('home'); }
         }
+
+		// Fonction pour supprimer l'ami en cours de visionnage
+		async function deleteCurrentFriend() {
+		    if (!currentViewingFriendId) return;
+		    
+		    if (confirm("Voulez-vous vraiment retirer cet ami de votre liste locale ?")) {
+		        try {
+		            // Suppression dans la base locale IndexedDB
+		            await db.delete('friends', currentViewingFriendId);
+		            
+		            // Mise à jour de la liste en mémoire
+		            friends = await db.getAll('friends');
+		            
+		            // Rafraîchissement de l'affichage
+		            renderFriendsList();
+		            
+		            // Retour à la collection
+		            alert("Ami supprimé.");
+		            showView('collection');
+		            
+		        } catch (e) {
+		            console.error(e);
+		            alert("Erreur lors de la suppression.");
+		        }
+		    }
+		}
 
         function renderFriendCollection(items) {
             const c = document.getElementById('friend-collection-list'); c.innerHTML = '';
