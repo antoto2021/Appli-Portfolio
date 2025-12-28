@@ -431,9 +431,9 @@
                     <button onclick="showView('cali-hub')" class="bg-purple-100 text-purple-600 p-2 rounded-full">⬅️</button>
                     <h2 class="text-2xl font-bold text-purple-900">Wishlist</h2>
                 </div>
-                <button onclick="openSpotForm('wish')" class="bg-purple-600 text-white w-12 h-12 rounded-full font-bold shadow-lg text-xl flex items-center justify-center">+</button>
+                <button onclick="openWishModal()" class="bg-purple-600 text-white w-12 h-12 rounded-full font-bold shadow-lg text-xl flex items-center justify-center">+</button>
             </div>
-            <div id="cali-wishlist-list" class="space-y-4"></div>
+            <div id="cali-wishlist-list" class="space-y-3"></div>
         </div>
 
         <div id="view-cali-signal" class="hidden fade-in pb-20">
@@ -608,6 +608,24 @@
             </form>
         </div>
     </div>
+
+        <!-- MODAL Wishlist -->
+        <div id="wish-modal" class="hidden fixed inset-0 z-[100] bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
+            <div class="bg-white w-full max-w-sm rounded-2xl shadow-2xl p-6">
+                <h3 class="text-xl font-bold text-slate-800 mb-4">Ajouter une envie 🧞</h3>
+                <form onsubmit="handleWishSubmit(event)" class="space-y-4">
+                    <input type="hidden" id="wish-id-input">
+                    <div>
+                        <label class="text-[10px] font-bold uppercase text-slate-400">Votre idée (Texte, Lien, Emoji...)</label>
+                        <textarea id="wish-text" class="input-field h-32 text-lg" placeholder="Ex: Goûter la Blue Dream du coffeeshop X..." required></textarea>
+                    </div>
+                    <div class="flex gap-3 pt-2">
+                        <button type="button" onclick="document.getElementById('wish-modal').classList.add('hidden')" class="flex-1 py-3 border border-slate-300 rounded-xl text-slate-500 font-bold">Annuler</button>
+                        <button type="submit" class="flex-1 py-3 bg-purple-600 text-white rounded-xl font-bold hover:bg-purple-500">Ajouter</button>
+                    </div>
+                </form>
+            </div>
+        </div>
 
 	<!-- Le script est dans le fichier app.js -->
 
