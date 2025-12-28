@@ -894,6 +894,54 @@
         function closeFriendDetail() {
             document.getElementById('friend-detail-modal').classList.add('hidden');
         }
+								
+								// Fonction pour copier l'ID
+									function copyToClipboard() {
+									    if (!myUid) return alert("ID non chargé.");
+									    
+									    // Utilisation de l'API moderne du presse-papier
+									    navigator.clipboard.writeText(myUid).then(() => {
+									        // Feedback visuel sur le bouton
+									        const btn = document.getElementById('btn-copy-id');
+									        const originalText = btn.innerText;
+									        
+									        btn.innerText = "✅ Copié !";
+									        btn.classList.add('bg-green-100', 'text-green-700', 'border-green-300');
+									        
+									        // On remet l'état normal après 2 secondes
+									        setTimeout(() => {
+									            btn.innerText = originalText;
+									            btn.classList.remove('bg-green-100', 'text-green-700', 'border-green-300');
+									        }, 2000);
+									    }).catch(err => {
+									        console.error('Erreur copie:', err);
+									        alert("Impossible de copier automatiquement.");
+									    });
+									}
+									
+									// Fonction pour partager l'ID (Menu natif du téléphone)
+									async function shareId() {
+									    if (!myUid) return alert("ID non chargé.");
+									
+									    const shareData = {
+									        title: 'Mon ID Green Codex',
+									        text: `Salut ! Ajoute-moi sur Green Codex pour voir ma collection. Mon ID est : ${myUid}`,
+									    };
+									
+									    // Vérifie si le navigateur supporte le partage natif (Mobile)
+									    if (navigator.share) {
+									        try {
+									            await navigator.share(shareData);
+									        } catch (err) {
+									            // L'utilisateur a annulé ou erreur, on ne fait rien
+									        }
+									    } else {
+									        // Fallback pour PC : on copie juste le texte
+									        copyToClipboard();
+									        alert("Le menu de partage n'est pas dispo sur ce navigateur. L'ID a été copié !");
+									    }
+									}
+
 
         // --- AUTRES UTILITAIRES ---
         function getFlag(c) {
