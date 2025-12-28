@@ -33,6 +33,14 @@
         let currentSlide = 0;
         let comparatorChart = null; // Important pour détruire le chart existant
 
+		// --- UTILITAIRE : Récupérer le nom d'un ami via son ID ---
+		function getFriendName(uid) {
+		    if (uid === myUid) return "Moi"; // Cas particulier pour soi-même
+		    const friend = friends.find(f => f.id === uid);
+		    if (friend) return friend.name; // Retourne le nom enregistré (ex: "Pascal")
+		    return `Inconnu (${uid.substring(0, 4)}..)`; // Fallback si pas dans la liste d'amis
+		}
+
         // --- DONNÉES MAÎTRESSE (REFONDU POUR LISIBILITÉ) ---
         const masterData = { 
             hash_dry: { 
@@ -1211,17 +1219,23 @@
 		        if (snap.exists()) {
 		            const members = snap.data().members || [];
 		            container.innerHTML = '';
-		            
-		            // Pour chaque ID, on affiche une ligne (dans une vraie app, on chercherait les noms)
-		            members.forEach(uid => {
-		                const isMe = uid === myUid ? " (Moi)" : "";
-		                const html = `
-		                <div class="bg-white p-3 rounded-xl border border-slate-100 flex items-center gap-3">
-		                    <div class="w-10 h-10 bg-indigo-100 text-indigo-600 rounded-full flex items-center justify-center font-bold">👤</div>
-		                    <div class="font-mono text-xs text-slate-600 truncate flex-1">${uid}${isMe}</div>
-		                </div>`;
-		                container.insertAdjacentHTML('beforeend', html);
-		            });
+
+				// Pour chaque ID, on cherche le nom dans la liste d'amis locale
+				            members.forEach(uid => {
+				                const displayName = getFriendName(uid); // <--- Utilisation du nom
+				                const isMe = uid === myUid ? " (Vous)" : "";
+				                
+				                const html = `
+				                <div class="bg-white p-3 rounded-xl border border-slate-100 flex items-center gap-3">
+				                    <div class="w-10 h-10 bg-indigo-100 text-indigo-600 rounded-full flex items-center justify-center font-bold">
+				                        ${displayName.charAt(0).toUpperCase()}
+				                    </div>
+				                    <div class="font-bold text-sm text-slate-700 truncate flex-1">
+				                        ${escapeHTML(displayName)}${isMe}
+				                    </div>
+				                </div>`;
+				                container.insertAdjacentHTML('beforeend', html);
+				            });
 		        }
 		    } catch(e) { container.innerHTML = "Erreur chargement."; }
 		}
@@ -1245,37 +1259,37 @@
 			let currentCaliType = 'spot'; // 'spot' ou 'wish'
 			let allCaliSpotsCache = []; // Cache pour le filtrage local
 			
-function openSpotForm(type) {
-    currentCaliType = type;
-    const modal = document.getElementById('cali-spot-modal');
-    
-    const config = {
-        spot: { title: "Nouveau Spot 📍", emoji: "📍" },
-        wish: { title: "Nouvelle Envie 🧞", emoji: "🧞" }
-    };
-    
-    document.getElementById('csm-title').innerText = config[type].title;
-    document.getElementById('csm-type').value = type;
-    document.getElementById('csm-emoji').value = config[type].emoji;
-    
-    // --- CORRECTION (BUG FIX) ---
-    // Réinitialisation de l'ID pour être sûr de créer un nouvel item
-    document.getElementById('spot-id-input').value = ""; 
-    
-    // Reset form fields
-    document.getElementById('csm-name').value = "";
-    document.getElementById('csm-link').value = "";
-    document.getElementById('csm-lat').value = "";
-    document.getElementById('csm-lon').value = "";
-    document.getElementById('csm-city').value = "";
-    document.getElementById('csm-desc').value = "";
-    // Idéalement, remettre la catégorie à défaut aussi
-    if(document.getElementById('csm-cat')) document.getElementById('csm-cat').selectedIndex = 0;
-    
-    modal.classList.remove('hidden');
-}
+		function openSpotForm(type) {
+		    currentCaliType = type;
+		    const modal = document.getElementById('cali-spot-modal');
+		    
+		    const config = {
+		        spot: { title: "Nouveau Spot 📍", emoji: "📍" },
+		        wish: { title: "Nouvelle Envie 🧞", emoji: "🧞" }
+		    };
+		    
+		    document.getElementById('csm-title').innerText = config[type].title;
+		    document.getElementById('csm-type').value = type;
+		    document.getElementById('csm-emoji').value = config[type].emoji;
+		    
+		    // --- CORRECTION (BUG FIX) ---
+		    // Réinitialisation de l'ID pour être sûr de créer un nouvel item
+		    document.getElementById('spot-id-input').value = ""; 
+		    
+		    // Reset form fields
+		    document.getElementById('csm-name').value = "";
+		    document.getElementById('csm-link').value = "";
+		    document.getElementById('csm-lat').value = "";
+		    document.getElementById('csm-lon').value = "";
+		    document.getElementById('csm-city').value = "";
+		    document.getElementById('csm-desc').value = "";
+		    // Idéalement, remettre la catégorie à défaut aussi
+		    if(document.getElementById('csm-cat')) document.getElementById('csm-cat').selectedIndex = 0;
+		    
+		    modal.classList.remove('hidden');
+		}
 			
-			function parseMapsLink(url) {
+		function parseMapsLink(url) {
 			    const regex = /(-?\d+\.\d+)[,\/!](-?\d+\.\d+)/;
 			    const match = url.match(regex);
 			    if (match && match.length >= 3) {
@@ -1498,7 +1512,7 @@ function renderLocationList(items, container, type) {
 		        container.innerHTML = '';
 		        let amIActive = false;
 		        
-		        snap.forEach(d => {
+			snap.forEach(d => {
 		            const sig = d.data();
 		            const diffHours = (Date.now() - sig.timestamp) / (1000 * 60 * 60);
 		            
@@ -1510,13 +1524,18 @@ function renderLocationList(items, container, type) {
 		                    myStatus.className = "text-xl font-black text-rose-600 mb-1";
 		                    myTime.innerText = `Il y a ${Math.floor(diffHours < 1 ? diffHours * 60 : diffHours)} ${diffHours < 1 ? 'min' : 'heures'}`;
 		                } else {
+		                    // RÉCUPÉRATION DU NOM DE L'AMI
+		                    const friendName = getFriendName(d.id); // <--- Ici
+		                    
 		                    const html = `
 		                    <div class="bg-rose-50 border border-rose-100 p-3 rounded-xl flex justify-between items-center">
 		                        <div>
-		                            <span class="font-bold text-rose-800">Ami (${d.id.substring(0,4)}..)</span>
+		                            <span class="font-bold text-rose-800 text-sm">👤 ${escapeHTML(friendName)}</span>
 		                            <div class="text-sm font-bold text-slate-700">📍 ${escapeHTML(sig.spotName)}</div>
 		                        </div>
-		                        <span class="text-xs bg-white px-2 py-1 rounded text-rose-400 font-mono">${Math.floor(diffHours < 1 ? diffHours * 60 : diffHours)}${diffHours < 1 ? 'm' : 'h'}</span>
+		                        <span class="text-xs bg-white px-2 py-1 rounded text-rose-400 font-mono">
+		                            ${Math.floor(diffHours < 1 ? diffHours * 60 : diffHours)}${diffHours < 1 ? 'm' : 'h'}
+		                        </span>
 		                    </div>`;
 		                    container.insertAdjacentHTML('beforeend', html);
 		                }
