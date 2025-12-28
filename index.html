@@ -156,7 +156,8 @@
         <div id="edit-banner" class="hidden w-full bg-amber-500 text-white text-center text-xs font-bold py-1 mt-2 rounded shadow-inner">MODE ÉDITION ACTIF - Cliquez sur n'importe quel texte pour le modifier.</div>
     </header>
 
-    <main class="max-w-7xl mx-auto p-4 md:p-8 space-y-16">
+    <!-- FIX MARGE NEGATIVE : Padding-top réduit à 2 pour coller au header -->
+    <main class="max-w-7xl mx-auto px-4 md:px-8 pb-8 pt-2 space-y-16">
 
         <!-- ==================== VIEW: HOME ==================== -->
         <div id="view-home" class="fade-in space-y-16">
@@ -360,6 +361,20 @@
                         </div>
                     </div>
                     <button onclick="verifyUpdate(this)" class="mt-4 w-full bg-emerald-600 text-white font-bold py-2 rounded-lg hover:bg-emerald-500 transition text-sm flex justify-center items-center gap-2"><span>🔄</span> Vérifier maintenant</button>
+                    
+                    <!-- ZONE SECURITE (BACKUP/RESTORE) -->
+                    <div class="mt-4 pt-4 border-t border-emerald-200">
+                        <p class="text-[10px] uppercase text-emerald-600 mb-2 font-bold tracking-widest text-center">Zone de Sécurité</p>
+                        <div class="grid grid-cols-2 gap-3">
+                            <button onclick="exportBackup()" class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-3 rounded-lg text-xs shadow-sm flex items-center justify-center gap-1 transition-colors">
+                                <span>💾</span> Sauvegarder (JSON)
+                            </button>
+                            <label class="bg-slate-500 hover:bg-slate-600 text-white font-bold py-2 px-3 rounded-lg text-xs shadow-sm flex items-center justify-center gap-1 transition-colors cursor-pointer">
+                                <span>📂</span> Restaurer (JSON)
+                                <input type="file" accept=".json" class="hidden" onchange="importBackup(this)">
+                            </label>
+                        </div>
+                    </div>
                 </div>
 
                 <!-- STOCKAGE -->
@@ -989,6 +1004,15 @@
             document.getElementById('cd-date').innerText = new Date(i.date).toLocaleDateString();
             document.getElementById('cd-farm').innerText = i.farm || 'Inconnu';
             
+            // LOGIQUE AJOUTÉE : TYPE DE HASH (MODIFICATION 3)
+            const hashBadge = document.getElementById('cd-hash-badge');
+            if (i.category === 'hash' && i.type) {
+                hashBadge.innerText = i.type;
+                hashBadge.classList.remove('hidden');
+            } else {
+                hashBadge.classList.add('hidden');
+            }
+
             if (i.observation) {
                 document.getElementById('cd-observation').innerText = i.observation;
                 document.getElementById('cd-observation-container').classList.remove('hidden');
@@ -1285,7 +1309,53 @@
             setTimeout(() => { btn.innerHTML = originalText; btn.disabled = false; }, 2000);
         }
 
+        // --- FONCTIONS DE SAUVEGARDE ET RESTAURATION (MODIFICATION 2) ---
+        async function exportBackup() {
+            const data = {
+                collection: await db.getAll('collection'),
+                customSections: customSections,
+                timestamp: Date.now()
+            };
+            const blob = new Blob([JSON.stringify(data)], {type: 'application/json'});
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `GreenCodex_Backup_${new Date().toISOString().split('T')[0]}.json`;
+            a.click();
+        }
 
+        async function importBackup(input) {
+            const file = input.files[0];
+            if(!file) return;
+            const reader = new FileReader();
+            reader.onload = async (e) => {
+                try {
+                    const data = JSON.parse(e.target.result);
+                    if(data.collection && Array.isArray(data.collection)) {
+                        if(confirm(`Restaurer ${data.collection.length} éléments ? Cela fusionnera avec votre collection actuelle.`)) {
+                            // On fusionne la collection
+                            for(const item of data.collection) {
+                                // On garde l'ID s'il existe pour écraser l'ancien, sinon nouvel ID auto
+                                await db.save('collection', item);
+                            }
+                            // On restaure les sections personnalisées
+                            if(data.customSections && Array.isArray(data.customSections)) {
+                                customSections = data.customSections;
+                                await db.save('config', {key: 'customSections', value: customSections});
+                            }
+                            alert('Restauration terminée avec succès !');
+                            location.reload();
+                        }
+                    } else {
+                        alert('Format de fichier invalide.');
+                    }
+                } catch(err) {
+                    alert('Erreur lors de la lecture du fichier de sauvegarde.');
+                    console.error(err);
+                }
+            };
+            reader.readAsText(file);
+        }
 
         async function handlePostUpdate() {
             const c = await fetchLatestCommit();
