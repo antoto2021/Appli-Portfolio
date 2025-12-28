@@ -273,15 +273,22 @@
         </div>
 
         <!-- ==================== VIEW: FRIEND PORTFOLIO ==================== -->
-        <div id="view-friend" class="hidden fade-in pb-20">
-            <!-- Header Ami (Collé en haut avec marges négatives) -->
-            <div class="-mt-4 -mx-4 md:-mt-8 md:-mx-8 bg-blue-600 text-white p-6 shadow-lg mb-6 md:rounded-b-2xl">
-                <h2 class="text-3xl font-bold mb-2">Portfolio de <span id="friend-view-name">Ami</span></h2>
-                <p class="text-blue-200 text-sm">Mode lecture seule.</p>
-            </div>
-            <div id="friend-collection-list" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"></div>
-            <div id="friend-empty-state" class="hidden text-center py-20 text-slate-400"><div class="text-6xl mb-4">🔒</div><p>Aucune entrée visible ou portefeuille privé.</p></div>
-        </div>
+		<div id="view-friend" class="hidden fade-in pb-20">
+		    <div class="-mt-4 -mx-4 md:-mt-8 md:-mx-8 bg-blue-600 text-white p-6 shadow-lg mb-6 md:rounded-b-2xl relative">
+		        <button onclick="showView('collection')" class="absolute top-6 right-6 text-blue-200 hover:text-white font-bold text-sm">Fermer ✕</button>
+		        <h2 class="text-3xl font-bold mb-2">Portfolio de <span id="friend-view-name">Ami</span></h2>
+		        <p class="text-blue-200 text-sm">Mode lecture seule.</p>
+		    </div>
+		            
+		    <div id="friend-collection-list" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"></div>
+		    <div id="friend-empty-state" class="hidden text-center py-20 text-slate-400"><div class="text-6xl mb-4">🔒</div><p>Aucune entrée visible ou portefeuille privé.</p></div>
+		            
+		    <div class="mt-12 mb-8 text-center border-t border-slate-100 pt-8">
+		        <button onclick="deleteCurrentFriend()" class="text-red-500 font-bold border border-red-200 px-6 py-3 rounded-xl hover:bg-red-50 transition flex items-center gap-2 mx-auto">
+		            <span>🗑️</span> Retirer cet ami de ma liste
+		        </button>
+		    </div>
+		</div>
 
         <!-- ==================== VIEW: INFO ==================== -->
         <div id="view-info" class="hidden fade-in space-y-8">
