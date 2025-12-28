@@ -199,45 +199,57 @@
         }
 
         // --- FONCTIONS COLLECTION & DONNÉES ---
-        // NOUVELLE FONCTION DE CALCUL DU STOCKAGE
-        async function calculateStorageUsage() {
-            const elSmall = document.getElementById('storage-used');
-            const elBig = document.getElementById('info-storage-size');
-            
-            // Tentative via l'API Storage Manager (le standard moderne)
-            if ('storage' in navigator && 'estimate' in navigator.storage) {
-                try {
-                    const { usage } = await navigator.storage.estimate();
-                    // usage est en octets
-                    let size = "";
-                    if (usage < 1024) size = usage + " B";
-                    else if (usage < 1024 * 1024) size = (usage / 1024).toFixed(1) + " KB";
-                    else size = (usage / (1024 * 1024)).toFixed(2) + " MB";
-
-                    if (elSmall) elSmall.innerText = `(${size})`;
-                    if (elBig) elBig.innerText = size;
-                } catch (e) {
-                    console.error("Erreur estimation stockage", e);
-                    if (elSmall) elSmall.innerText = "(Erreur)";
-                    if (elBig) elBig.innerText = "N/A";
-                }
-            } else {
-                // Fallback : Calcul manuel approximatif (moins précis pour les blobs, mais fonctionnel)
-                try {
-                     const col = await db.getAll('collection');
-                     const conf = await db.getAll('config');
-                     const fr = await db.getAll('friends');
-                     const totalStr = JSON.stringify(col) + JSON.stringify(conf) + JSON.stringify(fr);
-                     const bytes = new Blob([totalStr]).size; // Approximation via Blob
-
-                     let size = (bytes / (1024 * 1024)).toFixed(2) + " MB";
-                     if (elSmall) elSmall.innerText = `(~${size})`;
-                     if (elBig) elBig.innerText = `~${size}`;
-                } catch(e) {
-                     if (elSmall) elSmall.innerText = "(Inconnu)";
-                }
-            }
-        }
+        // MODIFICATION : Calcul précis des données utilisateur uniquement (Texte + Photos)
+		async function calculateStorageUsage() {
+		    const elSmall = document.getElementById('storage-used');
+		    const elBig = document.getElementById('info-storage-size');
+		    
+		    let totalBytes = 0;
+		
+		    try {
+		        // 1. Poids de la configuration et des amis (Texte JSON)
+		        const config = await db.getAll('config');
+		        const friends = await db.getAll('friends');
+		        totalBytes += new Blob([JSON.stringify(config)]).size;
+		        totalBytes += new Blob([JSON.stringify(friends)]).size;
+		
+		        // 2. Poids de la collection (Items + Photos)
+		        if (collection && collection.length > 0) {
+		            collection.forEach(item => {
+		                // Poids des données textuelles de l'item
+		                // On exclut les photos du stringify pour ne pas compter en double ou compter la structure
+		                const { photos, ...textData } = item;
+		                totalBytes += new Blob([JSON.stringify(textData)]).size;
+		
+		                // Poids des photos
+		                if (item.photos && Array.isArray(item.photos)) {
+		                    item.photos.forEach(photo => {
+		                        if (photo instanceof Blob) {
+		                            // Si c'est un Blob (Nouvelle méthode optimisée)
+		                            totalBytes += photo.size;
+		                        } else if (typeof photo === 'string') {
+		                            // Si c'est du Base64 (Anciennes images avant migration)
+		                            totalBytes += photo.length; 
+		                        }
+		                    });
+		                }
+		            });
+		        }
+		
+		        // Formatage de l'affichage
+		        let sizeStr = "";
+		        if (totalBytes < 1024) sizeStr = totalBytes + " B";
+		        else if (totalBytes < 1024 * 1024) sizeStr = (totalBytes / 1024).toFixed(1) + " KB";
+		        else sizeStr = (totalBytes / (1024 * 1024)).toFixed(2) + " MB";
+		
+		        if (elSmall) elSmall.innerText = `(${sizeStr})`;
+		        if (elBig) elBig.innerText = sizeStr;
+		
+		    } catch (e) {
+		        console.error("Erreur calcul stockage:", e);
+		        if (elSmall) elSmall.innerText = "(?)";
+		    }
+		}
 
         function updateDashboardStats() {
             document.getElementById('stats-total').innerText = collection.length;
