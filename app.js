@@ -16,6 +16,15 @@
 				.replace(/"/g, "&quot;")
 				.replace(/'/g, "&#039;");
 		}
+
+		// Utilitaire pour afficher soit du Base64 (vieux), soit du Blob (nouveau)
+		function getImageSrc(imgData) {
+		    if (!imgData) return '';
+		    // Si c'est déjà une chaine de caractères (Base64), on la retourne telle quelle
+		    if (typeof imgData === 'string') return imgData;
+		    // Sinon, c'est un Blob/File, on crée une URL virtuelle rapide
+		    return URL.createObjectURL(imgData);
+		}
 		
         let firebaseInstance = null, myUid = null;
         let collection = [], contentMap = {}, customSections = [], friends = [], currentFriendItems = [];
@@ -242,8 +251,9 @@
             c.innerHTML = '';
             document.getElementById('empty-state').classList.toggle('hidden', collection.length > 0);
             
-            [...collection].reverse().forEach(i => {
-                const p = i.photos && i.photos.length ? `<img src="${i.photos[0]}" class="w-full h-full object-cover">` : `<div class="w-full h-full flex items-center justify-center text-3xl opacity-30">${i.category === 'hash' ? '🍫' : '🥦'}</div>`;
+            [...collection].reverse().forEach(i => {*
+				const imgSrc = (i.photos && i.photos.length) ? getImageSrc(i.photos[0]) : null;
+                const p = imgSrc ? `<img src="${imgSrc}" class="w-full h-full object-cover">` : `<div class="w-full h-full flex items-center justify-center text-3xl opacity-30">${i.category === 'hash' ? '🍫' : '🥦'}</div>`;
                 const h = `
 				<div onclick="openCollectionDetail(${i.id})" class="bg-white rounded-xl shadow-sm border border-slate-100 p-4 flex gap-4 relative group hover:border-emerald-300 transition cursor-pointer">
 					<div class="w-20 h-20 rounded-lg bg-slate-100 flex-shrink-0 overflow-hidden relative">${p}</div>
@@ -592,18 +602,19 @@
             const t = document.getElementById('cd-thumbs');
             t.innerHTML = '';
             
-            if (i.photos && i.photos.length > 0) {
-                m.src = i.photos[0];
-                m.classList.remove('opacity-30', 'p-10');
-                if (i.photos.length > 1) {
-                    i.photos.forEach(s => {
-                        const el = document.createElement('img');
-                        el.src = s;
-                        el.className = "w-12 h-12 rounded-lg border-2 border-white/50 cursor-pointer object-cover";
-                        el.onclick = () => m.src = s;
-                        t.appendChild(el);
-                    });
-                }
+			if (i.photos && i.photos.length > 0) {
+			    m.src = getImageSrc(i.photos[0]); // <--- Utilisation de getImageSrc
+			    m.classList.remove('opacity-30', 'p-10');
+			    
+			    if (i.photos.length > 1) {
+			        i.photos.forEach(s => {
+			            const el = document.createElement('img');
+			            el.src = getImageSrc(s); // <--- Utilisation de getImageSrc
+			            el.className = "w-12 h-12 rounded-lg border-2 border-white/50 cursor-pointer object-cover";
+			            el.onclick = () => m.src = getImageSrc(s); // <--- Ici aussi
+			            t.appendChild(el);
+			        });
+			    }
             } else {
                 m.src = "";
             }
@@ -614,25 +625,29 @@
             document.getElementById('collection-detail-modal').classList.add('hidden');
         }
 
-        // --- GESTION IMAGES ---
-        function compressImage(f, w = 1200, q = 0.8) {
-            return new Promise(r => {
-                const R = new FileReader();
-                R.onload = e => {
-                    const i = new Image();
-                    i.onload = () => {
-                        const c = document.createElement('canvas');
-                        let W = i.width, H = i.height;
-                        if (W > w) { H *= w / W; W = w; }
-                        c.width = W; c.height = H;
-                        c.getContext('2d').drawImage(i, 0, 0, W, H);
-                        r(c.toDataURL('image/jpeg', q));
-                    };
-                    i.src = e.target.result;
-                };
-                R.readAsDataURL(f);
-            });
-        }
+		// Nouvelle version optimisée (Retourne un Blob)
+		function compressImage(f, w = 1200, q = 0.8) {
+		    return new Promise(r => {
+		        const R = new FileReader();
+		        R.onload = e => {
+		            const i = new Image();
+		            i.onload = () => {
+		                const c = document.createElement('canvas');
+		                let W = i.width, H = i.height;
+		                if (W > w) { H *= w / W; W = w; }
+		                c.width = W; c.height = H;
+		                c.getContext('2d').drawImage(i, 0, 0, W, H);
+		                
+		                // Ici on change : on exporte en Blob au lieu de toDataURL
+		                c.toBlob(blob => {
+		                    r(blob);
+		                }, 'image/jpeg', q);
+		            };
+		            i.src = e.target.result;
+		        };
+		        R.readAsDataURL(f);
+		    });
+		}
 
         async function handlePhotos(i) {
             if (i.files) {
@@ -644,11 +659,11 @@
         }
 
         function renderPhotoPreviews() {
-            document.getElementById('photo-preview-list').innerHTML = currentPhotos.map((s, i) => `
-                <div class="w-20 h-20 rounded-xl relative overflow-hidden group flex-shrink-0">
-                    <img src="${s}" class="w-full h-full object-cover">
-                    <button type="button" onclick="currentPhotos.splice(${i},1);renderPhotoPreviews()" class="absolute top-0 right-0 bg-red-500 text-white text-xs p-1 opacity-0 group-hover:opacity-100">X</button>
-                </div>`).join('');
+			document.getElementById('photo-preview-list').innerHTML = currentPhotos.map((s, i) => `
+			    <div class="w-20 h-20 rounded-xl relative overflow-hidden group flex-shrink-0">
+			        <img src="${getImageSrc(s)}" class="w-full h-full object-cover">
+			        <button type="button" onclick="currentPhotos.splice(${i},1);renderPhotoPreviews()" class="absolute top-0 right-0 bg-red-500 text-white text-xs p-1 opacity-0 group-hover:opacity-100">X</button>
+			    </div>`).join('');
         }
 
         // --- GESTION SECTIONS PERSONNALISÉES ---
