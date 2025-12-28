@@ -135,25 +135,46 @@
             }
         };
 
-        // --- FONCTIONS NAVIGATION & UI ---
-        function showView(viewId) {
-            document.querySelectorAll('[id^="view-"]').forEach(el => el.classList.add('hidden'));
-            document.getElementById(`view-${viewId}`).classList.remove('hidden');
-            document.getElementById('navBackBtn').classList.toggle('hidden', viewId === 'home');
-            document.getElementById('editModeBtn').classList.toggle('hidden', viewId !== 'home');
-            
-            const infoBtn = document.querySelector('button[onclick="showView(\'info\')"]');
-            if(infoBtn) infoBtn.style.display = (viewId === 'home' || viewId === 'info') ? 'flex' : 'none';
-            
-            window.scrollTo(0,0);
-            if(viewId === 'collection') renderCollectionList();
-            if(viewId === 'info') renderInfoView();
-        }
-
-        function toggleSection(id) {
-            const e = document.getElementById(id);
-            if(e) e.classList.toggle('expanded');
-        }
+		// MODIFICATION : showView avec triggers Cali Team
+		function showView(viewId) {
+		    // Masquer toutes les vues
+		    document.querySelectorAll('[id^="view-"]').forEach(el => el.classList.add('hidden'));
+		    
+		    // Afficher la vue demandée
+		    const target = document.getElementById(`view-${viewId}`);
+		    if (target) target.classList.remove('hidden');
+		    
+		    // Gestion des boutons de navigation (Header)
+		    const navBack = document.getElementById('navBackBtn');
+		    const editBtn = document.getElementById('editModeBtn');
+		    
+		    if (viewId === 'home') {
+		        navBack.classList.add('hidden');
+		        editBtn.classList.remove('hidden');
+		    } else {
+		        navBack.classList.remove('hidden');
+		        editBtn.classList.add('hidden');
+		    }
+		    
+		    // Bouton Info
+		    const infoBtn = document.querySelector('button[onclick="showView(\'info\')"]');
+		    if(infoBtn) infoBtn.style.display = (viewId === 'home' || viewId === 'info') ? 'flex' : 'none';
+		    
+		    window.scrollTo(0,0);
+		    
+		    // --- TRIGGERS DE CHARGEMENT ---
+		    if(viewId === 'collection') renderCollectionList();
+		    if(viewId === 'info') renderInfoView();
+		    
+		    // Triggers Cali Team
+		    if(viewId === 'cali-friends') loadCaliMembers();
+		    if(viewId === 'cali-spots') loadCaliLocations('spot');
+		    if(viewId === 'cali-utils') loadCaliLocations('util');
+		    if(viewId === 'cali-signal') {
+		        loadCaliSignals();
+		        loadCaliLocations('spot'); // Pour afficher la liste de sélection
+		    }
+		}
 
         // --- FONCTIONS MODE ÉDITION ---
         function toggleEditMode() {
@@ -1137,6 +1158,271 @@
             
             initApp().then(() => { if (u.has('v')) handlePostUpdate(); });
         });
+
+		// === LOGIQUE CALI TEAM (GROUPE UNIQUE) === //
+
+		const CALI_GROUP_ID = "cali_team_v1"; // ID Fixe dans Firebase
+		
+		// 1. Entrer dans le groupe (Vérifie et crée le groupe si inexistant)
+		async function openCaliTeam() {
+		    if (!firebaseInstance) { alert("Connexion requise"); return; }
+		    
+		    // On bascule la vue immédiatement pour la réactivité
+		    showView('cali-hub');
+		    
+		    // Vérification silencieuse de l'existence du groupe
+		    try {
+		        const { doc, getDoc, setDoc } = window.firebaseFuncs;
+		        const { db } = firebaseInstance;
+		        const groupRef = doc(db, 'groups', CALI_GROUP_ID);
+		        const groupSnap = await getDoc(groupRef);
+		
+		        if (!groupSnap.exists()) {
+		            // Création automatique si premier lancement
+		            await setDoc(groupRef, {
+		                name: "Cali Team",
+		                members: [myUid], // Je m'ajoute comme premier membre
+		                createdAt: new Date().toISOString()
+		            });
+		        }
+		    } catch(e) { console.error("Err Cali Init", e); }
+		}
+		
+		// 2. Gestion des MEMBRES (Amis)
+		async function loadCaliMembers() {
+		    const container = document.getElementById('cali-members-list');
+		    container.innerHTML = '<div class="wn-loader"></div>';
+		    
+		    try {
+		        const { doc, getDoc } = window.firebaseFuncs;
+		        const { db } = firebaseInstance;
+		        const snap = await getDoc(doc(db, 'groups', CALI_GROUP_ID));
+		        
+		        if (snap.exists()) {
+		            const members = snap.data().members || [];
+		            container.innerHTML = '';
+		            
+		            // Pour chaque ID, on affiche une ligne (dans une vraie app, on chercherait les noms)
+		            members.forEach(uid => {
+		                const isMe = uid === myUid ? " (Moi)" : "";
+		                const html = `
+		                <div class="bg-white p-3 rounded-xl border border-slate-100 flex items-center gap-3">
+		                    <div class="w-10 h-10 bg-indigo-100 text-indigo-600 rounded-full flex items-center justify-center font-bold">👤</div>
+		                    <div class="font-mono text-xs text-slate-600 truncate flex-1">${uid}${isMe}</div>
+		                </div>`;
+		                container.insertAdjacentHTML('beforeend', html);
+		            });
+		        }
+		    } catch(e) { container.innerHTML = "Erreur chargement."; }
+		}
+		
+		async function addMemberToCali() {
+		    const newUid = prompt("Entrez l'ID Unique de l'ami à ajouter :");
+		    if (!newUid) return;
+		    
+		    try {
+		        const { doc, updateDoc, arrayUnion } = window.firebaseFuncs;
+		        const { db } = firebaseInstance;
+		        await updateDoc(doc(db, 'groups', CALI_GROUP_ID), {
+		            members: arrayUnion(newUid)
+		        });
+		        loadCaliMembers();
+		        alert("Membre ajouté !");
+		    } catch(e) { alert("Erreur : " + e.message); }
+		}
+		
+		// 3. Gestion des SPOTS & UTILES
+		let currentCaliType = 'spot'; // 'spot' ou 'util'
+		
+		function openSpotForm(type) {
+		    currentCaliType = type;
+		    const modal = document.getElementById('cali-spot-modal');
+		    document.getElementById('csm-title').innerText = type === 'spot' ? "Nouveau Spot 📍" : "Nouveau Service 🚰";
+		    document.getElementById('csm-type').value = type;
+		    document.getElementById('csm-emoji').value = type === 'spot' ? "📍" : "🚰";
+		    
+		    // Reset form
+		    document.getElementById('csm-name').value = "";
+		    document.getElementById('csm-link').value = "";
+		    document.getElementById('csm-lat').value = "";
+		    document.getElementById('csm-lon').value = "";
+		    document.getElementById('csm-city').value = "";
+		    document.getElementById('csm-desc').value = "";
+		    
+		    modal.classList.remove('hidden');
+		}
+		
+		function parseMapsLink(url) {
+		    // Regex pour extraire lat/lon des liens Google Maps
+		    const regex = /(-?\d+\.\d+)[,\/!](-?\d+\.\d+)/;
+		    const match = url.match(regex);
+		    if (match && match.length >= 3) {
+		        document.getElementById('csm-lat').value = match[1];
+		        document.getElementById('csm-lon').value = match[2];
+		    }
+		}
+		
+		async function handleCaliSpotSubmit(e) {
+		    e.preventDefault();
+		    const type = document.getElementById('csm-type').value;
+		    
+		    const data = {
+		        type: type,
+		        emoji: document.getElementById('csm-emoji').value,
+		        name: document.getElementById('csm-name').value,
+		        mapsLink: document.getElementById('csm-link').value,
+		        lat: document.getElementById('csm-lat').value,
+		        lon: document.getElementById('csm-lon').value,
+		        city: document.getElementById('csm-city').value || "Zone inconnue",
+		        category: document.getElementById('csm-cat').value,
+		        desc: document.getElementById('csm-desc').value,
+		        addedBy: myUid,
+		        createdAt: Date.now()
+		    };
+		    
+		    try {
+		        const { collection, addDoc } = window.firebaseFuncs;
+		        const { db } = firebaseInstance;
+		        // On sauvegarde dans la sous-collection 'locations'
+		        await addDoc(collection(db, 'groups', CALI_GROUP_ID, 'locations'), data);
+		        
+		        document.getElementById('cali-spot-modal').classList.add('hidden');
+		        loadCaliLocations(type); // Recharger la liste correspondante
+		    } catch(e) { alert("Erreur sauvegarde: " + e.message); }
+		}
+		
+		async function loadCaliLocations(targetType) {
+		    const listId = targetType === 'spot' ? 'cali-spots-list' : 'cali-utils-list';
+		    const container = document.getElementById(listId);
+		    if(!container) return;
+		    
+		    container.innerHTML = '<div class="wn-loader"></div>';
+		    
+		    try {
+		        const { collection, getDocs, query, where } = window.firebaseFuncs;
+		        const { db } = firebaseInstance;
+		        
+		        // On récupère tout ce qui correspond au type (spot ou util)
+		        const q = query(collection(db, 'groups', CALI_GROUP_ID, 'locations'), where("type", "==", targetType));
+		        const snap = await getDocs(q);
+		        
+		        container.innerHTML = '';
+		        if (snap.empty) { container.innerHTML = '<div class="text-center text-slate-400 italic">Rien ici pour le moment.</div>'; return; }
+		        
+		        const items = [];
+		        snap.forEach(d => items.push({id: d.id, ...d.data()}));
+		        
+		        // Tri par ville puis nom
+		        items.sort((a,b) => a.city.localeCompare(b.city));
+		        
+		        items.forEach(item => {
+		            const html = `
+		            <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-100 flex items-start gap-3 hover:border-blue-300 transition relative">
+		                <div class="text-3xl">${item.emoji}</div>
+		                <div class="flex-1 min-w-0">
+		                    <div class="flex justify-between">
+		                        <h3 class="font-bold text-slate-800 truncate">${escapeHTML(item.name)}</h3>
+		                        <span class="text-[10px] font-bold bg-slate-100 px-2 py-1 rounded text-slate-500 h-fit">${escapeHTML(item.city)}</span>
+		                    </div>
+		                    <p class="text-xs text-slate-500 italic mt-1 line-clamp-2">${escapeHTML(item.desc)}</p>
+		                    ${item.lat ? `<a href="${item.mapsLink || '#'}" target="_blank" class="mt-2 inline-block text-xs font-bold text-blue-600 bg-blue-50 px-2 py-1 rounded">🗺️ Y aller</a>` : ''}
+		                </div>
+		                ${targetType === 'spot' ? `<button onclick="activateCaliSignal('${item.id}', '${escapeHTML(item.name)}')" class="absolute bottom-2 right-2 text-rose-500 text-xs font-bold border border-rose-200 px-2 py-1 rounded hover:bg-rose-50">📡 Signal</button>` : ''}
+		            </div>`;
+		            container.insertAdjacentHTML('beforeend', html);
+		        });
+		        
+		        // Si on est dans le menu Signal, on charge aussi la liste des spots pour pouvoir cliquer dessus
+		        if (targetType === 'spot') {
+		             const signalList = document.getElementById('cali-signal-spots-list');
+		             if(signalList) signalList.innerHTML = container.innerHTML; // Astuce : on duplique le contenu généré
+		        }
+		
+		    } catch(e) { console.error(e); }
+		}
+		
+		// 4. Gestion du SIGNAL (Live)
+		async function activateCaliSignal(spotId, spotName) {
+		    if(!confirm(`Se signaler à "${spotName}" pour 24h ?`)) return;
+		    
+		    try {
+		        const { doc, setDoc } = window.firebaseFuncs;
+		        const { db } = firebaseInstance;
+		        
+		        await setDoc(doc(db, 'groups', CALI_GROUP_ID, 'signals', myUid), {
+		            spotId,
+		            spotName,
+		            userId: myUid,
+		            timestamp: Date.now()
+		        });
+		        
+		        showView('cali-signal');
+		        loadCaliSignals();
+		    } catch(e) { alert("Erreur signal"); }
+		}
+		
+		async function loadCaliSignals() {
+		    const container = document.getElementById('cali-active-signals');
+		    const myStatus = document.getElementById('my-signal-status');
+		    const myTime = document.getElementById('my-signal-time');
+		    
+		    try {
+		        const { collection, getDocs } = window.firebaseFuncs;
+		        const { db } = firebaseInstance;
+		        
+		        const snap = await getDocs(collection(db, 'groups', CALI_GROUP_ID, 'signals'));
+		        container.innerHTML = '';
+		        let amIActive = false;
+		        
+		        snap.forEach(d => {
+		            const sig = d.data();
+		            const diffHours = (Date.now() - sig.timestamp) / (1000 * 60 * 60);
+		            
+		            if (diffHours < 24) {
+		                // C'est un signal valide
+		                if (d.id === myUid) {
+		                    amIActive = true;
+		                    myStatus.innerText = sig.spotName;
+		                    myStatus.className = "text-xl font-black text-rose-600 mb-1";
+		                    myTime.innerText = `Il y a ${Math.floor(diffHours < 1 ? diffHours * 60 : diffHours)} ${diffHours < 1 ? 'min' : 'heures'}`;
+		                } else {
+		                    const html = `
+		                    <div class="bg-rose-50 border border-rose-100 p-3 rounded-xl flex justify-between items-center">
+		                        <div>
+		                            <span class="font-bold text-rose-800">Ami (${d.id.substring(0,4)}..)</span>
+		                            <div class="text-sm font-bold text-slate-700">📍 ${escapeHTML(sig.spotName)}</div>
+		                        </div>
+		                        <span class="text-xs bg-white px-2 py-1 rounded text-rose-400 font-mono">${Math.floor(diffHours < 1 ? diffHours * 60 : diffHours)}${diffHours < 1 ? 'm' : 'h'}</span>
+		                    </div>`;
+		                    container.insertAdjacentHTML('beforeend', html);
+		                }
+		            }
+		        });
+		        
+		        if (!amIActive) {
+		            myStatus.innerText = "Aucun Signal";
+		            myStatus.className = "text-xl font-black text-slate-300 mb-1";
+		            myTime.innerText = "-";
+		        }
+		        
+		    } catch(e) { console.error(e); }
+		}
+		
+		async function clearMySignal() {
+		    try {
+		        const { doc, deleteDoc } = window.firebaseFuncs;
+		        const { db } = firebaseInstance;
+		        await deleteDoc(doc(db, 'groups', CALI_GROUP_ID, 'signals', myUid));
+		        loadCaliSignals();
+		    } catch(e) {}
+		}
+		
+		// Fonction de filtrage simple côté client
+		function filterSpots(filter) {
+		    // Cette fonction pourrait masquer/afficher les éléments du DOM en fonction d'un data-category
+		    // Pour simplifier, on recharge tout pour l'instant (à améliorer plus tard)
+		    alert("Filtre '" + filter + "' activé (Visuel à implémenter)");
+		}
 		
 		// --- PWA: ENREGISTREMENT SERVICE WORKER ---
 		if ('serviceWorker' in navigator) {
