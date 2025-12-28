@@ -1270,33 +1270,45 @@
 			}
 			
 			async function handleCaliSpotSubmit(e) {
-			    e.preventDefault();
-			    const type = document.getElementById('csm-type').value;
-			    
-			    const data = {
-			        type: type,
-			        emoji: document.getElementById('csm-emoji').value,
-			        name: document.getElementById('csm-name').value,
-			        mapsLink: document.getElementById('csm-link').value,
-			        lat: document.getElementById('csm-lat').value,
-			        lon: document.getElementById('csm-lon').value,
-			        city: document.getElementById('csm-city').value || "Zone inconnue",
-			        category: document.getElementById('csm-cat').value,
-			        desc: document.getElementById('csm-desc').value,
-			        addedBy: myUid,
-			        createdAt: Date.now()
-			    };
-			    
-			    try {
-			        const { collection, addDoc } = window.firebaseFuncs;
-			        const { db } = firebaseInstance;
-			        await addDoc(collection(db, 'groups', CALI_GROUP_ID, 'locations'), data);
-			        
-			        document.getElementById('cali-spot-modal').classList.add('hidden');
-			        loadCaliLocations(type); 
-											
-			    } catch(e) { alert("Erreur sauvegarde: " + e.message); }
-			}
+		    e.preventDefault();
+		    const type = document.getElementById('csm-type').value;
+		    const id = document.getElementById('spot-id-input').value; // Récupère l'ID si mode édition
+		    
+		    const data = {
+		        type: type,
+		        emoji: document.getElementById('csm-emoji').value,
+		        name: document.getElementById('csm-name').value,
+		        mapsLink: document.getElementById('csm-link').value,
+		        lat: document.getElementById('csm-lat').value,
+		        lon: document.getElementById('csm-lon').value,
+		        city: document.getElementById('csm-city').value || "Zone inconnue",
+		        category: document.getElementById('csm-cat').value,
+		        desc: document.getElementById('csm-desc').value,
+		        // On ne change pas addedBy ni createdAt en modification
+		    };
+		    
+		    if (!id) {
+		        data.addedBy = myUid;
+		        data.createdAt = Date.now();
+		    }
+		    
+		    try {
+		        const { collection, addDoc, doc, updateDoc } = window.firebaseFuncs;
+		        const { db } = firebaseInstance;
+		        
+		        if (id) {
+		            // MISE À JOUR
+		            await updateDoc(doc(db, 'groups', CALI_GROUP_ID, 'locations', id), data);
+		        } else {
+		            // CRÉATION
+		            await addDoc(collection(db, 'groups', CALI_GROUP_ID, 'locations'), data);
+		        }
+		        
+		        document.getElementById('cali-spot-modal').classList.add('hidden');
+		        loadCaliLocations(type); 
+		    } catch(e) { alert("Erreur sauvegarde: " + e.message); }
+		}
+
 
 async function loadCaliLocations(targetType) {
     // Détermination du conteneur
@@ -1345,24 +1357,23 @@ function renderDynamicFilters(items) {
     const filterContainer = document.querySelector('#view-cali-spots .no-scrollbar');
     if (!filterContainer) return;
 
-    // Récupérer les catégories uniques présentes
-    const categories = [...new Set(items.map(i => i.category))];
+    // Récupérer les catégories uniques
+    const categories = [...new Set(items.map(i => i.category).filter(Boolean))];
     
-    // HTML de base (Bouton "Tout")
-    let html = `<button onclick="filterSpots('all')" class="px-4 py-1 bg-slate-800 text-white rounded-full text-xs font-bold whitespace-nowrap transition transform active:scale-95">Tout</button>`;
+    let html = `<button onclick="filterSpots('all')" class="px-4 py-1 bg-slate-800 text-white rounded-full text-xs font-bold whitespace-nowrap transition transform active:scale-95 shadow-sm">Tout</button>`;
     
-    // Ajout des catégories trouvées
     const catColors = { 'Chill': 'emerald', 'Vue': 'blue', 'Eau': 'cyan', 'Abri': 'slate', 'Autre': 'gray' };
     
     categories.forEach(cat => {
         const color = catColors[cat] || 'gray';
-        html += `<button onclick="filterSpots('${cat}')" class="px-4 py-1 bg-${color}-100 text-${color}-800 rounded-full text-xs font-bold whitespace-nowrap transition transform active:scale-95 border border-${color}-200">${cat}</button>`;
+								
+      // Note: On passe la catégorie entre quotes simples pour éviter les bugs d'espaces
+        html += `<button onclick="filterSpots('${cat}')" class="px-4 py-1 bg-${color}-100 text-${color}-800 rounded-full text-xs font-bold whitespace-nowrap transition transform active:scale-95 border border-${color}-200 ml-2">${cat}</button>`;
     });
     
     filterContainer.innerHTML = html;
 }
 
-// Fonction de filtrage active
 function filterSpots(category) {
     const container = document.getElementById('cali-spots-list');
     let filteredItems = allCaliSpotsCache;
@@ -1370,34 +1381,69 @@ function filterSpots(category) {
     if (category !== 'all') {
         filteredItems = allCaliSpotsCache.filter(i => i.category === category);
     }
-    
-    renderLocationList(filteredItems, container);
+				
+    // On réutilise la fonction d'affichage standard
+    renderLocationList(filteredItems, container, 'spot');
 }
 
-// Fonction d'affichage générique (Spots & Wishlist)
-function renderLocationList(items, container) {
+// Fonction d'affichage Polyvalente (Spots ou Wishlist)
+function renderLocationList(items, container, type) {
     container.innerHTML = '';
+    
     items.forEach(item => {
-        const isSpot = item.type === 'spot';
-        const borderColor = isSpot ? 'border-slate-100' : 'border-purple-100';
-        const hoverColor = isSpot ? 'hover:border-blue-300' : 'hover:border-purple-300';
-        
-        const html = `
-        <div class="bg-white p-4 rounded-xl shadow-sm border ${borderColor} flex items-start gap-3 ${hoverColor} transition relative">
-            <div class="text-3xl">${item.emoji}</div>
-            <div class="flex-1 min-w-0">
-                <div class="flex justify-between">
-                    <h3 class="font-bold text-slate-800 truncate">${escapeHTML(item.name)}</h3>
-                    <span class="text-[10px] font-bold bg-slate-100 px-2 py-1 rounded text-slate-500 h-fit">${escapeHTML(item.city)}</span>
+        if (type === 'spot') {
+            // --- VISUEL SPOT (Classique) ---
+            const html = `
+            <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-100 flex flex-col gap-3 hover:border-blue-300 transition relative group">
+                <div class="flex items-start gap-3">
+                    <div class="text-3xl bg-slate-50 w-12 h-12 flex items-center justify-center rounded-full flex-shrink-0">${item.emoji}</div>
+                    <div class="flex-1 min-w-0">
+                        <div class="flex justify-between items-start">
+                            <h3 class="font-bold text-slate-800 leading-tight">${escapeHTML(item.name)}</h3>
+                            <span class="text-[10px] font-bold bg-slate-100 px-2 py-1 rounded text-slate-500 h-fit whitespace-nowrap">${escapeHTML(item.city)}</span>
+                        </div>
+                        <p class="text-xs text-slate-500 italic mt-1 line-clamp-2">${escapeHTML(item.desc)}</p>
+                    </div>
                 </div>
-                <p class="text-xs text-slate-500 italic mt-1 line-clamp-2">${escapeHTML(item.desc)}</p>
-                ${item.lat ? `<a href="${item.mapsLink || '#'}" target="_blank" class="mt-2 inline-block text-xs font-bold text-blue-600 bg-blue-50 px-2 py-1 rounded">🗺️ Y aller</a>` : ''}
-            </div>
-            ${isSpot ? `<button onclick="activateCaliSignal('${item.id}', '${escapeHTML(item.name)}')" class="absolute bottom-2 right-2 text-rose-500 text-xs font-bold border border-rose-200 px-2 py-1 rounded hover:bg-rose-50">📡 Signal</button>` : ''}
-        </div>`;
-        container.insertAdjacentHTML('beforeend', html);
+                
+                <div class="flex items-center justify-between border-t border-slate-50 pt-2 mt-1">
+                    <div class="flex gap-2">
+                        ${item.lat ? `<a href="${item.mapsLink || '#'}" target="_blank" class="text-xs font-bold text-white bg-blue-500 px-3 py-1.5 rounded-lg shadow-sm">🗺️ Y aller</a>` : ''}
+                        <button onclick="activateCaliSignal('${item.id}', '${escapeHTML(item.name)}')" class="text-xs font-bold text-rose-500 bg-rose-50 border border-rose-200 px-3 py-1.5 rounded-lg">📡 Signal</button>
+                    </div>
+                    <div class="flex gap-3">
+                        <button onclick="editCaliItem('${item.id}', 'spot')" class="text-slate-400 hover:text-blue-500 text-lg">✎</button>
+                        <button onclick="deleteCaliItem('${item.id}', 'spot')" class="text-slate-400 hover:text-red-500 text-lg">🗑️</button>
+                    </div>
+                </div>
+            </div>`;
+            container.insertAdjacentHTML('beforeend', html);
+        
+        } else if (type === 'wish') {
+            // --- VISUEL WISHLIST (Bulles Simples) ---
+            const isDone = item.done === true;
+            const opacity = isDone ? 'opacity-50 grayscale' : '';
+            const checkColor = isDone ? 'bg-green-500 border-green-500 text-white' : 'bg-white border-slate-300 text-transparent';
+            
+            const html = `
+            <div class="bg-white p-4 rounded-2xl shadow-sm border border-purple-100 flex items-start gap-4 transition ${opacity}">
+                <button onclick="toggleWishStatus('${item.id}', ${!isDone})" class="mt-1 w-6 h-6 rounded-full border-2 ${checkColor} flex items-center justify-center transition-all flex-shrink-0 shadow-sm">✓</button>
+                
+                <div class="flex-1">
+                    <p class="text-slate-700 text-sm whitespace-pre-wrap leading-relaxed">${escapeHTML(item.text)}</p>
+                    <p class="text-[10px] text-slate-400 mt-2 text-right">Ajouté par un ami</p>
+                </div>
+
+                <div class="flex flex-col gap-2 border-l border-slate-100 pl-3 ml-2">
+                    <button onclick="editCaliItem('${item.id}', 'wish')" class="text-slate-400 hover:text-purple-500">✎</button>
+                    <button onclick="deleteCaliItem('${item.id}', 'wish')" class="text-slate-400 hover:text-red-500">🗑️</button>
+                </div>
+            </div>`;
+            container.insertAdjacentHTML('beforeend', html);
+        }
     });
 }
+
 
 		
 		// 4. Gestion du SIGNAL (Live)
@@ -1482,6 +1528,114 @@ function renderLocationList(items, container) {
 		    // Pour simplifier, on recharge tout pour l'instant (à améliorer plus tard)
 		    alert("Filtre '" + filter + "' activé (Visuel à implémenter)");
 		}
+		
+		// --- LOGIQUE ACTIONS & WISHLIST ---
+		
+		// 1. Ouvrir le modal Wishlist (Création ou Édition)
+		function openWishModal(id = null, text = "") {
+		    const modal = document.getElementById('wish-modal');
+		    const input = document.getElementById('wish-text');
+		    const idInput = document.getElementById('wish-id-input');
+		    
+		    input.value = text; // Vide si création, rempli si édition
+		    idInput.value = id || ""; 
+		    
+		    modal.classList.remove('hidden');
+		    input.focus();
+		}
+		
+		// 2. Soumission du formulaire Wishlist
+		async function handleWishSubmit(e) {
+		    e.preventDefault();
+		    const text = document.getElementById('wish-text').value;
+		    const id = document.getElementById('wish-id-input').value;
+		    
+		    if (!text || !firebaseInstance) return;
+		
+		    try {
+		        const { collection, addDoc, doc, updateDoc } = window.firebaseFuncs;
+		        const { db } = firebaseInstance;
+		
+		        if (id) {
+		            // Mode Édition
+		            await updateDoc(doc(db, 'groups', CALI_GROUP_ID, 'locations', id), { text: text });
+		        } else {
+		            // Mode Création
+		            await addDoc(collection(db, 'groups', CALI_GROUP_ID, 'locations'), {
+		                type: 'wish',
+		                text: text,
+		                done: false,
+		                addedBy: myUid,
+		                createdAt: Date.now()
+		            });
+		        }
+		        
+		        document.getElementById('wish-modal').classList.add('hidden');
+		        loadCaliLocations('wish');
+		    } catch(err) { alert("Erreur: " + err.message); }
+		}
+		
+		// 3. Toggle Status (Vœu réalisé ou non)
+		async function toggleWishStatus(id, newStatus) {
+		    try {
+		        const { doc, updateDoc } = window.firebaseFuncs;
+		        const { db } = firebaseInstance;
+		        await updateDoc(doc(db, 'groups', CALI_GROUP_ID, 'locations', id), { done: newStatus });
+		        // Rechargement silencieux pour mettre à jour l'UI
+		        loadCaliLocations('wish');
+		    } catch(e) { console.error(e); }
+		}
+		
+		// 4. Suppression Universelle (Spot ou Wish)
+		async function deleteCaliItem(id, type) {
+		    if(!confirm("Supprimer définitivement cet élément pour tout le groupe ?")) return;
+		    
+		    try {
+		        const { doc, deleteDoc } = window.firebaseFuncs;
+		        const { db } = firebaseInstance;
+		        await deleteDoc(doc(db, 'groups', CALI_GROUP_ID, 'locations', id));
+		        loadCaliLocations(type); // Rafraichir la liste concernée
+		    } catch(e) { alert("Erreur suppression: " + e.message); }
+		}
+		
+		// 5. Édition Universelle (Redirige vers le bon modal)
+		function editCaliItem(id, type) {
+		    // On doit retrouver l'objet dans le cache pour pré-remplir
+		    // Note: Pour la wishlist, on n'a pas mis en cache global, on va chercher dans le DOM ou faire une astuce.
+		    // Astuce simple : On relance une petite recherche locale ou on passe les params.
+		    // Pour faire propre, on va chercher dans la liste affichée (via une requête rapide ou cache).
+		    
+		    // Pour simplifier l'exemple, supposons qu'on récupère les données via Firebase getDoc si besoin, 
+		    // ou mieux, on utilise le cache si disponible.
+		    
+		    if (!firebaseInstance) return;
+		    const { doc, getDoc } = window.firebaseFuncs;
+		    const { db } = firebaseInstance;
+		    
+		    getDoc(doc(db, 'groups', CALI_GROUP_ID, 'locations', id)).then(snap => {
+		        if(snap.exists()) {
+		            const data = snap.data();
+		            if (type === 'wish') {
+		                openWishModal(id, data.text);
+		            } else if (type === 'spot') {
+		                // Remplir le gros modal Spot
+		                openSpotForm('spot'); // Ouvre vide
+		                // Remplir les champs
+		                document.getElementById('spot-id-input').value = id; // Important pour l'update
+		                document.getElementById('csm-name').value = data.name;
+		                document.getElementById('csm-emoji').value = data.emoji;
+		                document.getElementById('csm-link').value = data.mapsLink;
+		                document.getElementById('csm-city').value = data.city;
+		                document.getElementById('csm-cat').value = data.category;
+		                document.getElementById('csm-desc').value = data.desc;
+		                document.getElementById('csm-lat').value = data.lat;
+		                document.getElementById('csm-lon').value = data.lon;
+		                document.getElementById('csm-title').innerText = "Modifier le Spot ✏️";
+		            }
+		        }
+		    });
+		}
+
 		
 		// --- PWA: ENREGISTREMENT SERVICE WORKER ---
 		if ('serviceWorker' in navigator) {
