@@ -871,6 +871,16 @@
             document.getElementById('hash-fields').classList.toggle('hidden', c !== 'hash');
         }
 
+		// --- FONCTION ACCORDÉONS (Indispensable pour Info / À propos) ---
+		function toggleSection(id) {
+		    const e = document.getElementById(id);
+		    if(e) {
+		        // Bascule la classe 'expanded' qui doit gérer l'ouverture CSS
+		        e.classList.toggle('expanded');
+		
+		    }
+		}
+
         async function checkGitHubStatus() {
             if (GITHUB_USERNAME === 'antoto2021') console.log("GitHub Check");
             const c = await fetchLatestCommit();
@@ -1235,30 +1245,35 @@
 			let currentCaliType = 'spot'; // 'spot' ou 'wish'
 			let allCaliSpotsCache = []; // Cache pour le filtrage local
 			
-			function openSpotForm(type) {
-			    currentCaliType = type;
-			    const modal = document.getElementById('cali-spot-modal');
-			    
-			    // Configuration dynamique du titre et de l'emoji
-			    const config = {
-			        spot: { title: "Nouveau Spot 📍", emoji: "📍" },
-			        wish: { title: "Nouvelle Envie 🧞", emoji: "🧞" }
-			    };
-			    
-			    document.getElementById('csm-title').innerText = config[type].title;
-			    document.getElementById('csm-type').value = type;
-			    document.getElementById('csm-emoji').value = config[type].emoji;
-			    
-			    // Reset form
-			    document.getElementById('csm-name').value = "";
-			    document.getElementById('csm-link').value = "";
-			    document.getElementById('csm-lat').value = "";
-			    document.getElementById('csm-lon').value = "";
-			    document.getElementById('csm-city').value = "";
-			    document.getElementById('csm-desc').value = "";
-			    
-			    modal.classList.remove('hidden');
-			}
+function openSpotForm(type) {
+    currentCaliType = type;
+    const modal = document.getElementById('cali-spot-modal');
+    
+    const config = {
+        spot: { title: "Nouveau Spot 📍", emoji: "📍" },
+        wish: { title: "Nouvelle Envie 🧞", emoji: "🧞" }
+    };
+    
+    document.getElementById('csm-title').innerText = config[type].title;
+    document.getElementById('csm-type').value = type;
+    document.getElementById('csm-emoji').value = config[type].emoji;
+    
+    // --- CORRECTION (BUG FIX) ---
+    // Réinitialisation de l'ID pour être sûr de créer un nouvel item
+    document.getElementById('spot-id-input').value = ""; 
+    
+    // Reset form fields
+    document.getElementById('csm-name').value = "";
+    document.getElementById('csm-link').value = "";
+    document.getElementById('csm-lat').value = "";
+    document.getElementById('csm-lon').value = "";
+    document.getElementById('csm-city').value = "";
+    document.getElementById('csm-desc').value = "";
+    // Idéalement, remettre la catégorie à défaut aussi
+    if(document.getElementById('csm-cat')) document.getElementById('csm-cat').selectedIndex = 0;
+    
+    modal.classList.remove('hidden');
+}
 			
 			function parseMapsLink(url) {
 			    const regex = /(-?\d+\.\d+)[,\/!](-?\d+\.\d+)/;
@@ -1311,7 +1326,6 @@
 
 
 async function loadCaliLocations(targetType) {
-    // Détermination du conteneur
     const listId = targetType === 'spot' ? 'cali-spots-list' : 'cali-wishlist-list';
     const container = document.getElementById(listId);
     if(!container) return;
@@ -1329,27 +1343,32 @@ async function loadCaliLocations(targetType) {
         container.innerHTML = '';
         if (snap.empty) { container.innerHTML = '<div class="text-center text-slate-400 italic">Rien ici pour le moment.</div>'; return; }
         
-        // Stockage en mémoire pour le filtrage
         const items = [];
         snap.forEach(d => items.push({id: d.id, ...d.data()}));
         
-        // Tri par défaut (Ville)
-        items.sort((a,b) => a.city.localeCompare(b.city));
-        
+        // --- CORRECTION DU TRI (BUG FIX) ---
         if (targetType === 'spot') {
-            allCaliSpotsCache = items; // Sauvegarde pour les filtres
-            renderDynamicFilters(items); // Générer les boutons de filtre
-        }
-        
-        renderLocationList(items, container);
-        
-        // Si menu signal, on charge la liste pour la sélection
-        if (targetType === 'spot') {
-             const signalList = document.getElementById('cali-signal-spots-list');
+            // On ne trie par ville que si la ville existe
+            items.sort((a,b) => (a.city || "").localeCompare(b.city || ""));
+            
+            allCaliSpotsCache = items; 
+            renderDynamicFilters(items); 
+            
+            // Si menu signal, on charge aussi la liste
+            const signalList = document.getElementById('cali-signal-spots-list');
+            if(signalList) signalList.innerHTML = ''; // On vide d'abord
+            // On génère le HTML pour le signal (réutilisation de renderLocationList possible ou duplication simplifiée)
+            // Pour faire simple ici, on laisse le comportement d'origine qui semblait cloner le HTML:
+             renderLocationList(items, container, 'spot');
              if(signalList) signalList.innerHTML = container.innerHTML;
+
+        } else {
+            // Pour la Wishlist, on trie par date de création (le plus récent en haut)
+            items.sort((a,b) => (b.createdAt || 0) - (a.createdAt || 0));
+            renderLocationList(items, container, 'wish');
         }
 
-    } catch(e) { console.error(e); }
+    } catch(e) { console.error("Erreur chargement:", e); container.innerHTML = "Erreur..."; }
 }
 
 // Génération des boutons de filtre (Seulement si des items existent)
@@ -1521,14 +1540,7 @@ function renderLocationList(items, container, type) {
 		        loadCaliSignals();
 		    } catch(e) {}
 		}
-		
-		// Fonction de filtrage simple côté client
-		function filterSpots(filter) {
-		    // Cette fonction pourrait masquer/afficher les éléments du DOM en fonction d'un data-category
-		    // Pour simplifier, on recharge tout pour l'instant (à améliorer plus tard)
-		    alert("Filtre '" + filter + "' activé (Visuel à implémenter)");
-		}
-		
+				
 		// --- LOGIQUE ACTIONS & WISHLIST ---
 		
 		// 1. Ouvrir le modal Wishlist (Création ou Édition)
