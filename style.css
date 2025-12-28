@@ -70,3 +70,36 @@ body { font-family: 'Roboto', sans-serif; background-color: #F0FDF4; }
           .friend-avatar:hover { transform: scale(1.1); }
           .friend-avatar.add-btn { background-color: #f1f5f9; color: #cbd5e1; border: 2px dashed #cbd5e1; }
           .friend-avatar.add-btn:hover { border-color: #10b981; color: #10b981; }
+
+        /* CALI TEAM STYLES */
+        .bubble-card {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 1.5rem;
+            border-radius: 1rem;
+            border-width: 1px;
+            border-style: solid;
+            cursor: pointer;
+            transition: transform 0.1s ease, background-color 0.2s;
+            height: 120px;
+        }
+        .bubble-card:active {
+            transform: scale(0.95);
+        }
+        .bubble-icon {
+            font-size: 2.5rem;
+            line-height: 1;
+            margin-bottom: 0.5rem;
+        }
+        .bubble-title {
+            font-weight: 900;
+            font-size: 1.1rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+        
+        /* Scrollbar caché pour les filtres */
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
