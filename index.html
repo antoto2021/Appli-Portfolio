@@ -385,10 +385,10 @@
                     <span class="bubble-title">Spots</span>
                     <span class="text-xs mt-1 opacity-70">Lieux &amp; Chill</span>
                 </div>
-                <div onclick="showView('cali-utils')" class="bubble-card bg-cyan-50 text-cyan-700 border-cyan-100">
-                    <span class="bubble-icon">🚰</span>
-                    <span class="bubble-title">Utiles</span>
-                    <span class="text-xs mt-1 opacity-70">Eau, Abris...</span>
+                <div onclick="showView('cali-wishlist')" class="bubble-card bg-purple-50 text-purple-700 border-purple-100">
+                    <span class="bubble-icon">🧞</span>
+                    <span class="bubble-title">Wishlist</span>
+                    <span class="text-xs mt-1 opacity-70">À chasser</span>
                 </div>
                 <div onclick="showView('cali-signal')" class="bubble-card bg-rose-50 text-rose-700 border-rose-100">
                     <span class="bubble-icon">📡</span>
@@ -425,15 +425,15 @@
             <div id="cali-spots-list" class="space-y-4"></div>
         </div>
 
-        <div id="view-cali-utils" class="hidden fade-in pb-20">
+        <div id="view-cali-wishlist" class="hidden fade-in pb-20">
             <div class="flex justify-between items-center mb-6">
                 <div class="flex items-center gap-3">
-                    <button onclick="showView('cali-hub')" class="bg-cyan-100 text-cyan-600 p-2 rounded-full">⬅️</button>
-                    <h2 class="text-2xl font-bold text-cyan-900">Utiles</h2>
+                    <button onclick="showView('cali-hub')" class="bg-purple-100 text-purple-600 p-2 rounded-full">⬅️</button>
+                    <h2 class="text-2xl font-bold text-purple-900">Wishlist</h2>
                 </div>
-                <button onclick="openSpotForm('util')" class="bg-cyan-600 text-white w-12 h-12 rounded-full font-bold shadow-lg text-xl flex items-center justify-center">+</button>
+                <button onclick="openSpotForm('wish')" class="bg-purple-600 text-white w-12 h-12 rounded-full font-bold shadow-lg text-xl flex items-center justify-center">+</button>
             </div>
-            <div id="cali-utils-list" class="space-y-4"></div>
+            <div id="cali-wishlist-list" class="space-y-4"></div>
         </div>
 
         <div id="view-cali-signal" class="hidden fade-in pb-20">
