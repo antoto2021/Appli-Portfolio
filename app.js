@@ -797,17 +797,23 @@
         }
 
         function renderFriendsList() {
-            const container = document.getElementById('friends-list');
-            const addBtn = container.querySelector('.add-btn');
-            container.innerHTML = '';
-            friends.forEach(f => {
-                const el = document.createElement('div');
-                el.className = 'friend-avatar bg-blue-500 hover:bg-blue-600 border-2 border-white text-white shadow-sm';
-                el.innerText = f.initial; el.title = f.name; el.onclick = () => viewFriendPortfolio(f);
-                container.appendChild(el);
-            });
-            container.appendChild(addBtn);
-        }
+		    const container = document.getElementById('friends-list');
+		    
+		    // --- PROTECTION AJOUTÉE ICI ---
+		    // Si la balise n'existe plus dans le HTML (ce qu'on vient de faire), on arrête la fonction.
+		    if (!container) return; 
+		    // -----------------------------
+		
+		    const addBtn = container.querySelector('.add-btn');
+		    container.innerHTML = '';
+		    friends.forEach(f => {
+		        const el = document.createElement('div');
+		        el.className = 'friend-avatar bg-blue-500 hover:bg-blue-600 border-2 border-white text-white shadow-sm';
+		        el.innerText = f.initial; el.title = f.name; el.onclick = () => viewFriendPortfolio(f);
+		        container.appendChild(el);
+		    });
+		    if(addBtn) container.appendChild(addBtn);
+		}
 
         async function viewFriendPortfolio(friend) {
             if (!firebaseInstance || !window.firebaseFuncs) { alert("Connexion Cloud nécessaire."); return; }
