@@ -1393,7 +1393,7 @@
 		    }
 		}
 
-		// Fonction pour ajouter un membre au groupe (Cali Team)
+				// Fonction pour ajouter un membre au groupe (Cali Team) ET le nommer
 		async function addMemberToCali() {
 		    // 1. Vérification de sécurité
 		    if (!firebaseInstance) {
@@ -1402,23 +1402,34 @@
 		    }
 		
 		    // 2. Demande de l'ID
-		    const newUid = prompt("Entrez l'ID Unique de l'ami à ajouter :");
-		    
-		    // Si l'utilisateur annule ou laisse vide, on arrête
-		    if (!newUid || newUid.trim() === "") return;
+		    const inputUid = prompt("Entrez l'ID Unique de l'ami à ajouter :");
+		    if (!inputUid || inputUid.trim() === "") return;
+		    const newUid = inputUid.trim();
+		
+		    // 3. Demande du NOM (C'est ici que ça manquait !)
+		    const inputName = prompt("Comment voulez-vous nommer cet ami ? (Ex: Pascal)");
+		    const friendName = inputName && inputName.trim() !== "" ? inputName.trim() : "Ami Inconnu";
+		    const friendInitial = friendName.charAt(0).toUpperCase();
 		
 		    try {
 		        const { doc, updateDoc, arrayUnion } = window.firebaseFuncs;
 		        const { db } = firebaseInstance;
 		        
-		        // 3. Envoi à Firebase
-		        // On utilise arrayUnion pour ajouter sans effacer les autres
+		        // 4. Envoi à Firebase (Mise à jour du groupe)
 		        await updateDoc(doc(db, 'groups', CALI_GROUP_ID), {
-		            members: arrayUnion(newUid.trim())
+		            members: arrayUnion(newUid)
+		        });
+		
+		        // 5. Enregistrement LOCAL du nom (IndexedDB)
+		        // C'est ce qui permet d'afficher "Pascal" au lieu de l'ID
+		        await db.save('friends', { 
+		            id: newUid, 
+		            name: friendName, 
+		            initial: friendInitial 
 		        });
 		        
-		        // 4. Confirmation et rechargement de la liste
-		        alert("Membre ajouté avec succès !");
+		        // 6. Confirmation et rechargement
+		        alert(`C'est fait ! ${friendName} a été ajouté au groupe.`);
 		        loadCaliMembers();
 		        
 		    } catch(e) {
@@ -1426,6 +1437,7 @@
 		        alert("Erreur lors de l'ajout : " + e.message);
 		    }
 		}
+
 	// 3. Gestion des SPOTS & WISHLIST
 			let currentCaliType = 'spot'; // 'spot' ou 'wish'
 			let allCaliSpotsCache = []; // Cache pour le filtrage local
