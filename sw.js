@@ -1,11 +1,10 @@
-const CACHE_NAME = 'green-codex-v4';
+const CACHE_NAME = 'green-codex-v5';
 const ASSETS_TO_CACHE = [
   './',
   './index.html',
   './manifest.json',
   './logo appli.png',
   // On cache les librairies externes pour le mode hors-ligne
-  'https://cdn.tailwindcss.com',
   'https://cdn.jsdelivr.net/npm/chart.js',
   'https://cdn.plot.ly/plotly-2.27.0.min.js',
   'https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700;900&display=swap'
