@@ -82,6 +82,25 @@
             } 
         };
 
+		// --- LISTE DES JEUX MULTIJOUEURS ---
+		const gamesList = [
+		    { id: 'minigolf', name: 'Mini-Golf', icon: '⛳', color: 'emerald' },
+		    { id: 'bowling', name: 'Bowling', icon: '🎳', color: 'blue' },
+		    { id: 'bounce', name: 'Bounce', icon: '🏀', color: 'orange' },
+		    { id: 'archery', name: 'Tir à l\'arc', icon: '🏹', color: 'stone' },
+		    { id: 'fight', name: 'Combat', icon: '🥊', color: 'red' },
+		    { id: 'racing', name: 'Course', icon: '🏎️', color: 'zinc' },
+		    { id: 'pool', name: 'Billard', icon: '🎱', color: 'indigo' },
+		    { id: 'darts', name: 'Fléchettes', icon: '🎯', color: 'rose' },
+		    { id: 'pingpong', name: 'Tennis de Table', icon: '🏓', color: 'cyan' },
+		    { id: 'poker', name: 'Poker', icon: '🃏', color: 'slate' },
+		    { id: 'chess', name: 'Échecs', icon: '♟️', color: 'neutral' },
+		    { id: 'battleship', name: 'Bataille Navale', icon: '🚢', color: 'sky' },
+		    { id: 'snake', name: 'Snake', icon: '🐍', color: 'lime' },
+		    { id: 'quiz', name: 'Quiz Culture', icon: '❓', color: 'yellow' },
+		    { id: 'dice', name: 'Dés / Yam', icon: '🎲', color: 'purple' }
+		];
+
         const tutorialSlides = [
             { icon: "👋", title: "Bienvenue !", desc: "Découvrez Green Codex, votre encyclopédie cannabique interactive et personnelle." },
             { icon: "📖", title: "Encyclopédie", desc: "Explorez les fiches techniques : Indica, Sativa, Dry Sift, Rosin... Tout le savoir à portée de main." },
@@ -179,9 +198,9 @@
 		    if(viewId === 'cali-friends') loadCaliMembers();
 		    if(viewId === 'cali-spots') loadCaliLocations('spot');
 		    if(viewId === 'cali-wishlist') loadCaliLocations('wish');
-		    if(viewId === 'cali-signal') {
-		        loadCaliSignals();
-		        loadCaliLocations('spot'); // Pour afficher la liste de sélection
+		    if(viewId === 'cali-games') {
+		        renderGamesGrid();
+		        loadActivePlayers();
 		    }
 		}
 
@@ -1555,84 +1574,112 @@ function renderLocationList(items, container, type) {
 
 
 		
-		// 4. Gestion du SIGNAL (Live)
-		async function activateCaliSignal(spotId, spotName) {
-		    if(!confirm(`Se signaler à "${spotName}" pour 24h ?`)) return;
+		// --- LOGIQUE JEUX (GAMING HUB) ---
+		// 1. Afficher la grille des jeux
+		function renderGamesGrid() {
+		    const container = document.getElementById('cali-games-list');
+		    if (!container) return;
+		    container.innerHTML = '';
+		
+		    gamesList.forEach(game => {
+		        const html = `
+		        <div onclick="setGameStatus('${game.id}', '${escapeHTML(game.name)}')" class="bg-white p-3 rounded-xl shadow-sm border border-slate-100 flex flex-col items-center justify-center cursor-pointer hover:bg-${game.color}-50 hover:border-${game.color}-200 transition active:scale-95 h-24">
+		            <div class="text-3xl mb-1">${game.icon}</div>
+		            <div class="text-[10px] font-bold text-slate-600 uppercase text-center leading-tight">${game.name}</div>
+		        </div>`;
+		        container.insertAdjacentHTML('beforeend', html);
+		    });
+		}
+		
+		// 2. Se déclarer "Prêt à jouer"
+		async function setGameStatus(gameId, gameName) {
+		    if (!firebaseInstance) return;
+		    // Feedback visuel immédiat (Optionnel)
+		    document.getElementById('my-game-status').innerText = gameName + " (En attente...)";
 		    
 		    try {
 		        const { doc, setDoc } = window.firebaseFuncs;
 		        const { db } = firebaseInstance;
 		        
-		        await setDoc(doc(db, 'groups', CALI_GROUP_ID, 'signals', myUid), {
-		            spotId,
-		            spotName,
+		        // On écrase le statut précédent
+		        await setDoc(doc(db, 'groups', CALI_GROUP_ID, 'game_signals', myUid), {
+		            gameId: gameId,
+		            gameName: gameName,
 		            userId: myUid,
 		            timestamp: Date.now()
 		        });
 		        
-		        showView('cali-signal');
-		        loadCaliSignals();
-		    } catch(e) { alert("Erreur signal"); }
+		        loadActivePlayers(); // Rafraichir la liste
+		    } catch (e) { console.error("Err Game Status", e); }
 		}
-		
-		async function loadCaliSignals() {
-		    const container = document.getElementById('cali-active-signals');
-		    const myStatus = document.getElementById('my-signal-status');
-		    const myTime = document.getElementById('my-signal-time');
+
+		// 3. Voir qui joue à quoi
+		async function loadActivePlayers() {
+		    const container = document.getElementById('cali-active-players');
+		    const myStatusTxt = document.getElementById('my-game-status');
+		    
+		    if (!container) return;
 		    
 		    try {
 		        const { collection, getDocs } = window.firebaseFuncs;
 		        const { db } = firebaseInstance;
 		        
-		        const snap = await getDocs(collection(db, 'groups', CALI_GROUP_ID, 'signals'));
+		        const snap = await getDocs(collection(db, 'groups', CALI_GROUP_ID, 'game_signals'));
 		        container.innerHTML = '';
-		        let amIActive = false;
+		        let amIPlaying = false;
 		        
-			snap.forEach(d => {
-		            const sig = d.data();
-		            const diffHours = (Date.now() - sig.timestamp) / (1000 * 60 * 60);
+		        if (snap.empty) {
+		            container.innerHTML = '<div class="col-span-full text-center text-slate-400 italic text-sm py-4">La salle d\'arcade est vide.</div>';
+		        }
+		
+		        snap.forEach(d => {
+		            const data = d.data();
+		            // On filtre les statuts vieux de plus de 2 heures
+		            const diffMins = (Date.now() - data.timestamp) / 60000;
 		            
-		            if (diffHours < 24) {
-		                // C'est un signal valide
-		                if (d.id === myUid) {
-		                    amIActive = true;
-		                    myStatus.innerText = sig.spotName;
-		                    myStatus.className = "text-xl font-black text-rose-600 mb-1";
-		                    myTime.innerText = `Il y a ${Math.floor(diffHours < 1 ? diffHours * 60 : diffHours)} ${diffHours < 1 ? 'min' : 'heures'}`;
-		                } else {
-		                    // RÉCUPÉRATION DU NOM DE L'AMI
-		                    const friendName = getFriendName(d.id); // <--- Ici
-		                    
-		                    const html = `
-		                    <div class="bg-rose-50 border border-rose-100 p-3 rounded-xl flex justify-between items-center">
-		                        <div>
-		                            <span class="font-bold text-rose-800 text-sm">👤 ${escapeHTML(friendName)}</span>
-		                            <div class="text-sm font-bold text-slate-700">📍 ${escapeHTML(sig.spotName)}</div>
-		                        </div>
-		                        <span class="text-xs bg-white px-2 py-1 rounded text-rose-400 font-mono">
-		                            ${Math.floor(diffHours < 1 ? diffHours * 60 : diffHours)}${diffHours < 1 ? 'm' : 'h'}
-		                        </span>
-		                    </div>`;
-		                    container.insertAdjacentHTML('beforeend', html);
+		            if (diffMins < 120) { 
+		                const friendName = getFriendName(d.id);
+		                const isMe = d.id === myUid;
+		                
+		                if (isMe) {
+		                    amIPlaying = true;
+		                    myStatusTxt.innerText = `Prêt pour : ${data.gameName}`;
+		                    myStatusTxt.className = "text-lg font-black text-indigo-600";
 		                }
+		
+		                // On cherche l'icône du jeu
+		                const gameObj = gamesList.find(g => g.id === data.gameId) || { icon: '🎮', color: 'gray' };
+		
+		                const html = `
+		                <div class="bg-white border-l-4 border-${gameObj.color}-500 p-3 rounded-lg shadow-sm flex items-center justify-between">
+		                    <div class="flex items-center gap-3">
+		                        <div class="text-2xl">${gameObj.icon}</div>
+		                        <div>
+		                            <div class="font-bold text-slate-800 text-sm">${escapeHTML(friendName)}</div>
+		                            <div class="text-xs text-slate-500">veut jouer à <strong>${escapeHTML(data.gameName)}</strong></div>
+		                        </div>
+		                    </div>
+		                    <span class="text-[10px] bg-slate-100 text-slate-500 px-2 py-1 rounded-full">${Math.floor(diffMins)} min</span>
+		                </div>`;
+		                container.insertAdjacentHTML('beforeend', html);
 		            }
 		        });
-		        
-		        if (!amIActive) {
-		            myStatus.innerText = "Aucun Signal";
-		            myStatus.className = "text-xl font-black text-slate-300 mb-1";
-		            myTime.innerText = "-";
+		
+		        if (!amIPlaying) {
+		            myStatusTxt.innerText = "Inactif";
+		            myStatusTxt.className = "text-lg font-black text-slate-300";
 		        }
-		        
-		    } catch(e) { console.error(e); }
+		
+		    } catch (e) { console.error(e); }
 		}
 		
-		async function clearMySignal() {
+		// 4. Quitter la salle de jeu
+		async function quitGameLobby() {
 		    try {
 		        const { doc, deleteDoc } = window.firebaseFuncs;
 		        const { db } = firebaseInstance;
-		        await deleteDoc(doc(db, 'groups', CALI_GROUP_ID, 'signals', myUid));
-		        loadCaliSignals();
+		        await deleteDoc(doc(db, 'groups', CALI_GROUP_ID, 'game_signals', myUid));
+		        loadActivePlayers();
 		    } catch(e) {}
 		}
 				
