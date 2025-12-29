@@ -1625,7 +1625,7 @@ function renderLocationList(items, container, type) {
 		
 		    gamesList.forEach(game => {
 		        const html = `
-		        <div onclick="setGameStatus('${game.id}', '${escapeHTML(game.name)}')" class="bg-white p-3 rounded-xl shadow-sm border border-slate-100 flex flex-col items-center justify-center cursor-pointer hover:bg-${game.color}-50 hover:border-${game.color}-200 transition active:scale-95 h-24">
+		        <div onclick="window.location.href='jeux/${game.id}/index.html'" class="...">
 		            <div class="text-3xl mb-1">${game.icon}</div>
 		            <div class="text-[10px] font-bold text-slate-600 uppercase text-center leading-tight">${game.name}</div>
 		        </div>`;
