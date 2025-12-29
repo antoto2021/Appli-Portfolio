@@ -109,12 +109,14 @@
                 
                 <!-- Partie toujours visible (Teaser) -->
                 <div class="text-lg leading-relaxed text-slate-600 text-justify mb-4" data-editable="intro_teaser">
-                    <p>L'histoire du <strong>Cannabis Sativa L.</strong> est une épopée botanique et culturelle qui traverse les millénaires. Née dans les steppes d'Asie Centrale, probablement près du plateau tibétain, cette plante a été domestiquée par l'homme il y a plus de 10 000 ans, initialement pour ses fibres robustes et ses graines nutritives.</p>
+                    <p>L'histoire du <strong>Cannabis Sativa L.</strong> est une épopée botanique et culturelle qui traverse les millénaires.</p>
                 </div>
 
                 <!-- Partie repliable -->
                 <div class="collapsible-wrapper">
                     <div class="text-lg leading-relaxed text-slate-600 space-y-4 text-justify" data-editable="intro_text">
+						<p>Née dans les steppes d'Asie Centrale, probablement près du plateau tibétain, cette plante a été domestiquée par l'homme il y a plus de 10 000 ans, initialement pour ses fibres robustes et ses graines nutritives.</p>
+						
                         <p>Au fil des siècles, la plante a voyagé le long des routes de la soie, s'adaptant à divers climats pour donner naissance à deux grandes lignées : les variétés tropicales, élancées et énergisantes (Sativa), et les variétés de montagne, trapues et résineuses (Indica). Cette diversité génétique est aujourd'hui la base de milliers d'hybrides modernes.</p>
                         
                         <p>Historiquement, deux grandes traditions de consommation s'opposent et se complètent. D'un côté, la culture de la <strong>Fleur (Weed)</strong>, séchée avec soin pour préserver ses arômes délicats. De l'autre, l'art ancestral du <strong>Hashish</strong>, perfectionné au Moyen-Orient et en Asie (Maroc, Afghanistan, Népal), qui consiste à séparer mécaniquement les trichomes pour obtenir un concentré pur, stable et puissant.</p>
@@ -137,8 +139,8 @@
                     <div class="flex justify-between items-end mb-6">
                         <div>
                             <h2 class="section-title !text-white mb-2" data-editable="col_title">My Collection</h2>
-                            <p class="text-slate-400" data-editable="col_sub">Votre carnet de dégustation et d'archivage personnel.</p>
-                            <p class="text-xs text-slate-500 mt-1">Stockage : <span class="font-bold text-emerald-400">IndexedDB (Illimité)</span> <span id="storage-used" class="ml-2 text-slate-400 text-[10px] uppercase font-bold tracking-wider opacity-80">(Calcul...)</span></p>
+                            <p class="text-slate-400" data-editable="col_sub">Votre carnet de dégustation</p>
+                            <p class="text-xs text-slate-500 mt-1">Stockage :<span id="storage-used" class="ml-2 text-slate-400 text-[10px] uppercase font-bold tracking-wider opacity-80"> (Calcul...)</span></p>
                         </div>
                         <button onclick="showView('collection')" class="bg-emerald-500 hover:bg-emerald-400 text-white px-6 py-3 rounded-xl font-bold transition shadow-lg flex items-center gap-2"><span>📂</span> Ouvrir Portfolio</button>
                     </div>
@@ -146,7 +148,8 @@
                         <div class="bg-slate-800 p-4 rounded-xl border border-slate-700"><span class="text-slate-400 text-xs uppercase font-bold">Total Entrées</span><div class="text-3xl font-black text-white" id="stats-total">0</div></div>
                         <div class="bg-slate-800 p-4 rounded-xl border border-slate-700"><span class="text-slate-400 text-xs uppercase font-bold">Weeds 🥦</span><div class="text-3xl font-black text-emerald-400" id="stats-weed">0</div></div>
                         <div class="bg-slate-800 p-4 rounded-xl border border-slate-700"><span class="text-slate-400 text-xs uppercase font-bold">Hashs 🍫</span><div class="text-3xl font-black text-amber-500" id="stats-hash">0</div></div>
-                        <div class="bg-slate-800 p-4 rounded-xl border border-slate-700"><span class="text-slate-400 text-xs uppercase font-bold">Masse Totale</span><div class="text-3xl font-black text-purple-400" id="stats-mass">0g</div></div>
+                        <!-- <div class="bg-slate-800 p-4 rounded-xl border border-slate-700"><span class="text-slate-400 text-xs uppercase font-bold">Masse Totale</span><div class="text-3xl font-black text-purple-400" id="stats-mass">0g</div></div>
+						-->
                     </div>
                 </div>
             </section>
@@ -169,8 +172,13 @@
 
             <!-- FAMILIES SECTION -->
             <section>
-                <div class="mb-8 border-b border-slate-200 pb-4"><h2 class="section-title" data-editable="fam_title">Les Familles Fondamentales</h2><p class="text-slate-600 max-w-3xl text-justify" data-editable="fam_desc">Le marché moderne se divise en deux grands royaumes : la fleur brute et les extractions. Chacun possède ses méthodes, ses rituels et ses profils aromatiques distincts.</p></div>
-                <h3 class="text-xl font-bold text-slate-700 mb-4 flex items-center" data-editable="fam_sub1">🧪 Concentrés (Hash)</h3>
+				<div class="flex items-center gap-2 mb-2 cursor-pointer" onclick="toggleSection('famille-cards')">
+                	<div class="mb-8 border-b border-slate-200 pb-4"><h2 class="section-title" data-editable="fam_title">Les Familles Fondamentales</h2><p class="text-slate-600 max-w-3xl text-justify" data-editable="fam_desc">Le marché moderne se divise en deux grands royaumes : la fleur brute et les extractions. Chacun possède ses méthodes, ses rituels et ses profils aromatiques distincts.</p></div>
+				</div>
+				<div class="text-lg leading-relaxed text-slate-600 text-justify mb-4" data-editable="intro_teaser">
+                	<h3 class="text-xl font-bold text-slate-700 mb-4 flex items-center" data-editable="fam_sub1">🧪 Concentrés (Hash)</h3>
+				</div>
+<div class="collapsible-wrapper">				
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
                     <div onclick="showDetail('hash_dry')" class="bg-white p-6 rounded-xl shadow-md border-t-4 border-amber-500 card-interactive group"><div class="flex justify-between"> <div class="text-4xl mb-4">🏜️</div> <span class="text-xs font-bold text-amber-600 bg-amber-50 px-2 py-1 rounded h-fit">TRADITION</span> </div>
                     <h3 class="text-xl font-bold text-slate-800 group-hover:text-amber-600">Dry Sift</h3>
@@ -638,6 +646,10 @@
                 </form>
             </div>
         </div>
+</div>
+<button onclick="toggleSection('famille-cards')" class="absolute bottom-2 left-2 text-emerald-600 p-2 hover:bg-emerald-50 rounded-full transition">
+    <svg class="w-6 h-6 toggle-arrow" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+</button>
 
 	<!-- Le script est dans le fichier app.js -->
 
