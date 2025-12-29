@@ -103,3 +103,9 @@ body { font-family: 'Roboto', sans-serif; background-color: #F0FDF4; }
         /* Scrollbar caché pour les filtres */
         .no-scrollbar::-webkit-scrollbar { display: none; }
         .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+        /* --- JEUX STYLES --- */
+        #cali-games-list > div:active {
+            transform: scale(0.95);
+            background-color: #f8fafc; /* slate-50 */
+        }
