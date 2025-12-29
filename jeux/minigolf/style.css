@@ -1,1 +1,84 @@
+/* Reset et Base */
+body, html {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden; /* Empêche le scroll sur mobile */
+    background-color: #22c55e; /* Vert herbe */
+    font-family: 'Roboto', sans-serif;
+    touch-action: none; /* Désactive les gestes du navigateur */
+}
 
+/* Canvas Plein Écran */
+canvas {
+    display: block;
+    width: 100%;
+    height: 100%;
+}
+
+/* Interface Utilisateur */
+#ui-layer {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none; /* Laisse passer les clics vers le canvas */
+}
+
+.top-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px;
+    pointer-events: auto;
+}
+
+.btn-back {
+    background: rgba(255, 255, 255, 0.9);
+    padding: 8px 16px;
+    border-radius: 20px;
+    text-decoration: none;
+    font-weight: bold;
+    color: #166534;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+}
+
+.score-board {
+    background: rgba(0, 0, 0, 0.5);
+    color: white;
+    padding: 8px 16px;
+    border-radius: 20px;
+    font-weight: bold;
+}
+
+/* Écran de Victoire */
+#win-screen {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: white;
+    padding: 30px;
+    border-radius: 20px;
+    text-align: center;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+    pointer-events: auto;
+}
+
+.hidden {
+    display: none;
+}
+
+#win-screen h1 { margin-top: 0; color: #166534; }
+#win-screen button {
+    background: #166534;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 10px;
+    font-size: 1.2rem;
+    cursor: pointer;
+    margin-top: 15px;
+}
