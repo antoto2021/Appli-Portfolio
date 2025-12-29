@@ -1301,7 +1301,7 @@
 		    } catch(e) { console.error("Err Cali Init", e); }
 		}
 		
-		// 2. Gestion des MEMBRES (Amis)
+		// 2. Gestion des MEMBRES (Amis & Portfolio)
 		async function loadCaliMembers() {
 		    const container = document.getElementById('cali-members-list');
 		    container.innerHTML = '<div class="wn-loader"></div>';
@@ -1314,42 +1314,78 @@
 		        if (snap.exists()) {
 		            const members = snap.data().members || [];
 		            container.innerHTML = '';
-
-				// Pour chaque ID, on cherche le nom dans la liste d'amis locale
-				            members.forEach(uid => {
-				                const displayName = getFriendName(uid); // <--- Utilisation du nom
-				                const isMe = uid === myUid ? " (Vous)" : "";
-				                
-				                const html = `
-				                <div class="bg-white p-3 rounded-xl border border-slate-100 flex items-center gap-3">
-				                    <div class="w-10 h-10 bg-indigo-100 text-indigo-600 rounded-full flex items-center justify-center font-bold">
-				                        ${displayName.charAt(0).toUpperCase()}
-				                    </div>
-				                    <div class="font-bold text-sm text-slate-700 truncate flex-1">
-				                        ${escapeHTML(displayName)}${isMe}
-				                    </div>
-				                </div>`;
-				                container.insertAdjacentHTML('beforeend', html);
-				            });
+		            
+		            if(members.length === 0) {
+		                container.innerHTML = '<div class="text-center text-slate-400 italic">Aucun membre.</div>';
+		                return;
+		            }
+		
+		            members.forEach(uid => {
+		                const displayName = getFriendName(uid);
+		                const isMe = uid === myUid;
+		                const initial = displayName.charAt(0).toUpperCase();
+		                
+		                // Clic sur la carte = Voir Portfolio
+		                // Clic sur la poubelle = Supprimer
+		                const html = `
+		                <div onclick="viewPortfolioByUid('${uid}', '${escapeHTML(displayName)}')" class="bg-white p-4 rounded-xl border border-indigo-50 shadow-sm flex items-center gap-4 cursor-pointer hover:border-indigo-300 hover:shadow-md transition group relative">
+		                    <div class="w-12 h-12 bg-indigo-100 text-indigo-600 rounded-full flex items-center justify-center font-black text-xl shadow-inner">
+		                        ${initial}
+		                    </div>
+		                    <div class="flex-1 min-w-0">
+		                        <h4 class="font-bold text-slate-800 truncate">${escapeHTML(displayName)}</h4>
+		                        <p class="text-[10px] text-slate-400 font-mono truncate">ID: ${uid.substring(0,6)}...</p>
+		                    </div>
+		                    ${!isMe ? `<button onclick="removeMemberFromCali('${uid}', event)" class="w-8 h-8 flex items-center justify-center rounded-full text-slate-300 hover:bg-red-50 hover:text-red-500 transition z-10" title="Retirer du groupe">✕</button>` : '<span class="text-xs font-bold text-indigo-200">Moi</span>'}
+		                    
+		                    <div class="absolute right-14 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition text-xs font-bold text-indigo-500 mr-2">
+		                        Voir 👁️
+		                    </div>
+		                </div>`;
+		                container.insertAdjacentHTML('beforeend', html);
+		            });
 		        }
-		    } catch(e) { container.innerHTML = "Erreur chargement."; }
+		    } catch(e) { 
+		        console.error(e);
+		        container.innerHTML = '<div class="text-red-400 text-center">Erreur chargement.</div>'; 
+		    }
 		}
 		
-		async function addMemberToCali() {
-		    const newUid = prompt("Entrez l'ID Unique de l'ami à ajouter :");
-		    if (!newUid) return;
+		// Fonction intermédiaire pour ouvrir le portfolio depuis l'ID
+		function viewPortfolioByUid(uid, name) {
+		    // On construit l'objet "friend" attendu par la fonction existante
+		    const friendObj = { id: uid, name: name };
+		    viewFriendPortfolio(friendObj);
+		}
+		
+		// Nouvelle fonction pour retirer un membre du groupe (Sans arrayRemove)
+		async function removeMemberFromCali(uidTarget, event) {
+		    event.stopPropagation(); // Empêche l'ouverture du portfolio au clic
 		    
-		    try {
-		        const { doc, updateDoc, arrayUnion } = window.firebaseFuncs;
-		        const { db } = firebaseInstance;
-		        await updateDoc(doc(db, 'groups', CALI_GROUP_ID), {
-		            members: arrayUnion(newUid)
-		        });
-		        loadCaliMembers();
-		        alert("Membre ajouté !");
-		    } catch(e) { alert("Erreur : " + e.message); }
-		}
+		    if(!confirm("Retirer cet utilisateur du groupe Cali Team ?\n(Il ne pourra plus voir les spots ni les signaux)")) return;
 		
+		    try {
+		        const { doc, getDoc, updateDoc } = window.firebaseFuncs;
+		        const { db } = firebaseInstance;
+		        const groupRef = doc(db, 'groups', CALI_GROUP_ID);
+		        
+		        // 1. On lit la liste actuelle
+		        const snap = await getDoc(groupRef);
+		        if(snap.exists()) {
+		            const currentMembers = snap.data().members || [];
+		            
+		            // 2. On filtre pour enlever l'ID ciblé
+		            const newMembers = currentMembers.filter(id => id !== uidTarget);
+		            
+		            // 3. On sauvegarde la nouvelle liste
+		            await updateDoc(groupRef, { members: newMembers });
+		            
+		            loadCaliMembers(); // Rafraîchir l'affichage
+		        }
+		    } catch(e) {
+		        alert("Erreur suppression : " + e.message);
+		    }
+		}
 	// 3. Gestion des SPOTS & WISHLIST
 			let currentCaliType = 'spot'; // 'spot' ou 'wish'
 			let allCaliSpotsCache = []; // Cache pour le filtrage local
