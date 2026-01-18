@@ -21,13 +21,10 @@
     
     <!-- FIREBASE MODULE (Authentification & Cloud) -->
     <script type="module">
-        // Import des fonctions nécessaires
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        // AJOUTS ICI : addDoc, updateDoc, arrayUnion, query, where
-        import { getFirestore, doc, setDoc, getDoc, addDoc, updateDoc, arrayUnion, collection, getDocs, deleteDoc, query, where } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+        import { getFirestore, doc, setDoc, getDoc, addDoc, updateDoc, arrayUnion, collection, getDocs, deleteDoc, query, where } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-        // CONFIGURATION FIREBASE
         const firebaseConfig = {
           apiKey: "AIzaSyCKuGuHgM3FiuHYdhFunbbqCThQJSBq3tQ",
           authDomain: "green-codex-app.firebaseapp.com",
@@ -38,7 +35,6 @@
           appId: "1:59967188926:web:a8211850f8f1aa6248d3ef"
         };
 
-        // Initialisation globale
         window.initFirebase = async () => {
             try {
                 const app = initializeApp(firebaseConfig);
@@ -46,7 +42,6 @@
                 const db = getFirestore(app);
                 const appId = 'green_codex_default'; 
                 
-                // EXPOSITION DES FONCTIONS GLOBALES (Indispensable pour app.js)
                 window.firebaseFuncs = { 
                     doc, setDoc, getDoc, addDoc, updateDoc, arrayUnion, 
                     collection, getDocs, deleteDoc, query, where 
@@ -69,7 +64,6 @@
             }
         };
     </script>
-
 
     <!-- STYLES CSS -->
 	
