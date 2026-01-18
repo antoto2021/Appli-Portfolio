@@ -1,4 +1,4 @@
-// --- FONCTION PRINCIPALE (APP) ---
+// --- FONCTION PRINCIPALE (MAIN) ---
 
 function showView(viewId) {
     document.querySelectorAll('[id^="view-"]').forEach(el => el.classList.add('hidden'));
