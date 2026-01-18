@@ -1,4 +1,4 @@
-// --- CONSTANTES & CONFIGURATION ---
+// --- CONSTANTES & CONFIGURATION ---//
 const DB_NAME = 'GreenCodexDB';
 const DB_VERSION = 1;
 const GITHUB_USERNAME = 'antoto2021';
