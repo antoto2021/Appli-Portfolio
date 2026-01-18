@@ -1,4 +1,4 @@
-// --- FONCTIONS GRAPHIQUES --- //
+// --- FONCTIONS GRAPHIQUES ---
 const initCharts = () => {
 	// Chart Puissance
 	const ctxPotency = document.getElementById('potencyChart');
