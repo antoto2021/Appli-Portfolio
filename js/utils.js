@@ -1,4 +1,4 @@
-// --- UTILITAIRES ---
+// --- UTILITAIRES ---//
 function escapeHTML(str) {
     if (!str) return '';
     return String(str)
