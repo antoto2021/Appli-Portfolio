@@ -64,6 +64,66 @@ async function handlePostUpdate() {
     document.getElementById('wn-btn').style.display = 'flex';
 }
 
+// --- FONCTION AFFICHER LES INFOS ---
+async function renderInfoView() {
+    // 1. Hash Local
+    const lh = localStorage.getItem(UPDATE_STORAGE_KEY) || 'Aucun';
+    const elLocalHash = document.getElementById('info-local-hash');
+    if(elLocalHash) elLocalHash.innerText = lh.substring(0, 7) + '...';
+    
+    // 2. Date de mise à jour (Calcul du temps écoulé)
+    const lt = localStorage.getItem(UPDATE_TIME_KEY);
+    const elLocalDate = document.getElementById('info-local-date');
+    
+    if (lt && elLocalDate) {
+        const diffMs = Date.now() - parseInt(lt);
+        const m = Math.floor(diffMs / 60000);
+        
+        let timeStr;
+        if (m < 60) {
+            timeStr = `Il y a ${m} min`;
+        } else if (m < 1440) { // Moins de 24h
+            timeStr = `Il y a ${Math.floor(m / 60)} h`;
+        } else if (m < 43200) { // Moins de 30 jours
+            timeStr = `Il y a ${Math.floor(m / 1440)} j`;
+        } else {
+            timeStr = `Il y a ${Math.floor(m / 43200)} mois`;
+        }
+        elLocalDate.innerText = timeStr;
+    } else if(elLocalDate) {
+         elLocalDate.innerText = "Date inconnue";
+    }
+
+    // 3. GitHub & Statut de connexion
+    const sd = document.getElementById('connection-status');
+    const re = document.getElementById('info-remote-hash');
+    if(re) re.innerText = "...";
+    if(sd) sd.className = "w-2 h-2 rounded-full bg-gray-400";
+    
+    // Appel à la fonction qui est déjà dans main.js
+    const rc = await fetchLatestCommit();
+    
+    if (rc) {
+        if(re) re.innerText = rc.sha.substring(0, 7) + '...';
+        if(sd) {
+            sd.classList.remove('bg-gray-400');
+            sd.classList.add('bg-green-500');
+        }
+    } else {
+        if(re) re.innerText = "Offline";
+        if(sd) {
+            sd.classList.remove('bg-gray-400');
+            sd.classList.add('bg-red-500');
+        }
+    }
+    
+    // 4. Afficher mon UID
+    if (myUid) {
+        const elUid = document.getElementById('my-uid-display');
+        if(elUid) elUid.innerText = myUid;
+    }
+}
+
 // --- INITIALISATION PRINCIPALE (Au chargement) ---
 async function initApp() {
     try {
