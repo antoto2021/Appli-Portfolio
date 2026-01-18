@@ -1,4 +1,4 @@
-// --- ÉTAT GLOBAL (VARIABLES) ---//
+// --- ÉTAT GLOBAL (VARIABLES) ---
 let firebaseInstance = null, myUid = null;
 let collection = [], contentMap = {}, customSections = [], friends = [], currentFriendItems = [];
 let isEditMode = false, currentPhotos = [], currentSectionImage = null;
