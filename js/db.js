@@ -1,4 +1,4 @@
-// --- GESTION BASE DE DONNÉES (IndexedDB) ---
+// --- GESTION BASE DE DONNÉES (IndexedDB) ---//
 const db = {
     instance: null,
     init: function() { 
